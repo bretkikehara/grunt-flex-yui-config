@@ -1,0 +1,41 @@
+{
+  "name": "grunt-flex-yui-group",
+  "description": "Creates a configuration for a YUI group.",
+  "version": "0.0.1",
+  "homepage": "https://github.com/bretkikehara/grunt-flex-yui-group",
+  "author": {
+    "name": "Bret K. Ikehara",
+    "url": "http://www.bikehara.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bretkikehara/grunt-flex-yui-group"
+  },
+  "bugs": {
+    "url": "https://github.com/gruntjs/grunt-flex-yui-group/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.github.com/bretkikehara/grunt-flex-yui-group/master/LICENSE.md"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-internal": "~0.4.6"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.0"
+  },
+  "keywords": [
+    "gruntplugin", "YUI"
+  ]
+}
