@@ -9,10 +9,8 @@
 module.exports = function(grunt) {
     "use strict";
 
-    var liboptions = require('./options.js'),
-        libprecompile = require('./precompile.js'),
-        libfilter = require('./filter.js'),
-        Handlebars = require('handlebars');
+    var liboptions = require(__dirname + '/options.js'),
+        libfilter = require(__dirname + '/filter.js');
 
     grunt.registerMultiTask(
         'yui-group',
