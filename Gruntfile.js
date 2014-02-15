@@ -25,11 +25,11 @@ module.exports = function(grunt) {
         },
         'yui-group': {
             test: {
-                files: {
+                files: [{
                     'tests/build/config.js': [
                         'tests/src/**/meta/*.json'
                     ]
-                }
+                }]
             }
         }
     });
@@ -40,8 +40,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
     grunt.registerTask('test', [
-        'nodeunit',
-        'yui-group'
+        'yui-group',
+        'nodeunit'
     ]);
     grunt.registerTask('default', [
         'jshint',
