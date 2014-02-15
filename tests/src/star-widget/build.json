@@ -1,0 +1,17 @@
+{
+  "name": "star-widget",
+  "exec": [
+    "less-compile"
+  ],
+  "builds": {
+    "star-panel": {
+      "jsfiles": ["star-panel.js"]
+    },
+    "star-overlay": {
+      "jsfiles": ["star-overlay.js"]
+    },    
+    "star-tooltip": {
+      "jsfiles": ["star-tooltip.js"]
+    }
+  }
+}

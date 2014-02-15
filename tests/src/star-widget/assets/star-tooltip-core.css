@@ -1,0 +1,39 @@
+.yui3-star-tooltip {
+  position: absolute;
+}
+.yui3-star-tooltip-content {
+  max-width: 400px;
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+  cursor: default;
+  font-size: 12px;
+  box-shadow: 1px 1px 1px #ccc;
+}
+div[title],
+span[title],
+a[title],
+p[title],
+label[title],
+h1[title],
+h2[title],
+h3[title],
+h4[title],
+h5[title],
+h6[title],
+ul[title],
+ol[title],
+li[title],
+img[title],
+input[title],
+textarea[title],
+table[title],
+tr[title],
+td[title],
+th[title],
+select[title] {
+  cursor: pointer;
+}
+.yui3-star-tooltip-hidden {
+  display: none;
+}

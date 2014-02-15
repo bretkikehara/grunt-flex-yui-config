@@ -1,0 +1,14 @@
+.yui3-skin-sam .yui3-star-overlay-content,
+.yui3-skin-sam .yui3-star-overlay .yui3-widget-hd,
+.yui3-skin-sam .yui3-star-overlay .yui3-widget-ft {
+  border-radius: 5px;
+}
+.yui3-skin-sam .yui3-star-overlay .yui3-widget-hd {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.yui3-skin-sam .yui3-star-overlay .yui3-widget-ft {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  background: white;
+}

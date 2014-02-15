@@ -1,0 +1,17 @@
+.yui3-panel .yui3-widget-stdmod,
+.yui3-star-panel .yui3-widget-bd,
+.yui3-star-panel .yui3-widget-ft,
+.yui3-panel .yui3-widget-bd,
+.yui3-star-panel .yui3-widget-ft {
+  background: white;
+}
+.yui3-panel .yui3-widget-stdmod {
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 1px 1px 1px #ccc;
+}
+.yui3-star-panel-hidden {
+  visibility: hidden;
+  left: -10000px;
+}
