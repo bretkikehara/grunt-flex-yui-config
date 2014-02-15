@@ -36,7 +36,7 @@ module.exports = {
     getDefaultOptions: function() {
         return {
             space: 2,
-            wrapperFile: __dirname + '/template/default-config.hbs'
+            wrapperFile: __dirname + '/template/default-wrapper.hbs'
         };
     }   
 };
