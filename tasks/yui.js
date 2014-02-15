@@ -1,8 +1,8 @@
 /*
- * grunt-handlebars-template
+ * grunt-flex-yui-group
  * http://gruntjs.com/
  *
- * Copyright (c) 2013 Bret K. Ikehara
+ * Copyright (c) 2014 Bret K. Ikehara
  * Licensed under the MIT license.
  */
 
