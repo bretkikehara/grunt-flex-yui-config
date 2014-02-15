@@ -78,7 +78,9 @@ module.exports = function(grunt) {
                     }, this).join('');
 
                     // wrap meta in the config.
-                    configContent = precompiler.wrap(meta);
+                    configContent = precompiler.wrap({
+                        meta: meta
+                    });
 
                     // Write joined contents to destination filepath.
                     grunt.file.write(file.dest, configContent);
