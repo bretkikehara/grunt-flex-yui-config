@@ -19,7 +19,7 @@ var fs = require('fs'),
 
 exports.run = {
     parseMeta: function(test) {
-        var filepath = __dirname + '/build/config.js';
+        var filepath = __dirname + '/build/config-meta.json';
 
         test.expect(2);
         readConfig(filepath, function(err, data) {
