@@ -35,6 +35,7 @@ module.exports = {
     },
     getDefaultOptions: function() {
         return {
+            space: 2
         };
     }   
 };

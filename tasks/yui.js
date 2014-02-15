@@ -28,7 +28,7 @@ module.exports = function(grunt) {
             */
             if (this.files && this.files.length > 0) {
                 this.files.forEach(function(file) {
-                    var modules = {};
+                    var metaConfig = {};
 
                     // store the meta data in the modules object.
                     file.src.map(function(filepath) {
@@ -37,12 +37,12 @@ module.exports = function(grunt) {
                             key;
 
                         for (key in meta) {
-                            modules[key] = meta[key];
+                            metaConfig[key] = meta[key];
                         }
                     }, this);
 
                     // Write joined contents to destination filepath.
-                    grunt.file.write(file.dest, JSON.stringify(modules));
+                    grunt.file.write(file.dest, JSON.stringify(metaConfig, null, options.space));
                 }, this);
             }
             else {
