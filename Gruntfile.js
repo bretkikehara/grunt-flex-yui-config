@@ -23,11 +23,20 @@ module.exports = function(grunt) {
                 'tests/test-*.js'
             ]
         },
-        'yui-group': {
+        'yui-meta': {
+            test: {
+                files: [{
+                    'tests/build/config-meta.json': [
+                        'tests/src/**/meta/*.json'
+                    ]
+                }]
+            }
+        },
+        'yui-config': {
             test: {
                 files: [{
                     'tests/build/config.js': [
-                        'tests/src/**/meta/*.json'
+                        'tests/build/config-meta.json'
                     ]
                 }]
             }
@@ -40,7 +49,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
     grunt.registerTask('test', [
-        'yui-group',
+        'yui-meta',
+        'yui-config',
         'nodeunit'
     ]);
     grunt.registerTask('default', [
