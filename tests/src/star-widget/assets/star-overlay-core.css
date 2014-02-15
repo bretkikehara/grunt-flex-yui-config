@@ -1,0 +1,9 @@
+.yui3-star-overlay-hidden {
+  display: none;
+}
+.yui3-star-overlay-content {
+  background: white;
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+}
