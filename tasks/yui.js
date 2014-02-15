@@ -21,16 +21,17 @@ module.exports = function(grunt) {
 
             grunt.verbose.writeflags(options, 'Options');
 
+            grunt.verbose.writeln('Reading configs from %s files', this.files.length);
+
             /**
             * Run the program.
             */
-            if (this.files.length > 0) {
+            if (this.files && this.files.length > 0) {
                 this.files.forEach(function(file) {
-                    var modules = {
+                    var modules = {};
 
-                    };
-
-                    files.map(function(filepath) {
+                    // store the meta data in the modules object.
+                    file.src.map(function(filepath) {
                         var filecontent = grunt.file.read(filepath),
                             meta = JSON.parse(filecontent),
                             key;
