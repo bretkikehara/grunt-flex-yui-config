@@ -21,20 +21,17 @@ grunt.loadNpmTasks('grunt-flex-yui-group');
 *This plugin was designed to work with Grunt 0.4.x. If you're still using grunt v0.3.x it's strongly recommended that [you upgrade](http://gruntjs.com/upgrading-from-0.3-to-0.4), but in case you can't please use [v0.3.3](https://github.com/gruntjs/grunt-flex-handlebars/tree/grunt-0.3-stable).*
 
 
-## Why is this tool different from other handlebars compiler?
+## Why is this tool different from Yogi?
 
-This uses Handlebars to precompile Handlebars templates. O_o o_O
+Yogi seemed to be made to release modules to the YUI gallery. For modules that will not be released in this fashion, this grunt plugin enables easy YUI configuration.
 
-Fundamentally, the grunt-contrib-handlebars was flawed because any new option would need to be added to the code. Not only would this continue to increase the code complexity, but it would mean that users are left to wait until a certain option was added to the main plugin. In the end, the user may need to compile their own version just to add missing functionality.
-
-This tool tries to eradicate the need to continually upgrade the tool when a new option is needed by controlling the precompiled output by using Handlebar templates. This tool precompiles the templates, then passes on the neccessary values to a template to create the precompiled file.
-
-## Handlebars task
+## YUI-group task
 _Run this task with the `grunt yui-group` command._
 
 Task targets, files and options may be specified according to the grunt [Configuring tasks](http://gruntjs.com/configuring-tasks) guide.
 
 ### Options
+
 
 
 
