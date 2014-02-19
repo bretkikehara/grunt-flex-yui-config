@@ -40,6 +40,16 @@ module.exports = function(grunt) {
                     ]
                 }]
             }
+        },
+        'yui-build': {
+            test: {
+                files: [{
+                    expand: false,
+                    cwd: 'tests',
+                    src: 'src/**/build.json',
+                    dest: 'tests/build/'
+                }]
+            }
         }
     });
 
@@ -51,6 +61,7 @@ module.exports = function(grunt) {
     grunt.registerTask('test', [
         'yui-meta',
         'yui-config',
+        'yui-build',
         'nodeunit'
     ]);
     grunt.registerTask('default', [
