@@ -62,26 +62,21 @@ module.exports = function(grunt) {
 
 
     grunt.registerTask('yui-config', function() {
-        var done = this.async();
+        var files,
+            configContent;
 
-        setTimeout(function() {
-            var files,
-                configContent;
+        // read the config
+        files = grunt.file.expand({
+            cwd: options.srcDir
+        }, '**/meta/*.json');
 
-            // read the config
-            files = grunt.file.expand({
-                cwd: options.srcDir
-            }, '**/meta/*.json');
+        metaConfig.read(options.srcDir, files);
 
-            metaConfig.read(options.srcDir, files);
-
-            // wrap meta in the config.
-            configContent = template.wrapConfig({
-                meta: metaConfig.toString(options.spaces)
-            });
-            grunt.file.write(options.buildDir + '/config.js', configContent);
-            done();
-        }, 100);
+        // wrap meta in the config.
+        configContent = template.wrapConfig({
+            meta: metaConfig.toString(options.spaces)
+        });
+        grunt.file.write(options.buildDir + '/config.js', configContent);
     });
 
     grunt.registerTask('yui',
