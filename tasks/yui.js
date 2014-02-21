@@ -14,6 +14,7 @@ module.exports = function(grunt) {
         libfilter = require(__dirname + '/filter.js'),
         libpath = require('path'),
         libutil = require('util'),
+        Handlebars = require('handlebars'),
         metaConfig = {
             metaConfig: {},
             read: function(cwd, files) {
@@ -36,6 +37,27 @@ module.exports = function(grunt) {
             toString: function(spaces) {
                 return JSON.stringify(this.metaConfig, null, spaces);
             }
+        },
+        template = {
+            init: function(name, filepath) {
+                var content = grunt.file.read(filepath);
+
+                // create template handler.
+                if (!content) {
+                    return null;
+                }
+
+                this[name] = Handlebars.compile(Handlebars.parse(content));
+
+                return this[name];
+            }
+        },
+        options = {
+            buildDir: 'build',
+            srcDir: 'src',
+            spaces: 2,
+            configWrapper: __dirname + '/template/config-wrapper.hbs',
+            moduleWrapper: __dirname + '/template/module-wrapper.hbs'
         };
 
     grunt.registerMultiTask(
