@@ -22,10 +22,15 @@ module.exports = function(grunt) {
         },
         metaConfig = {
             metaConfig: {},
-            read: function(cwd, files) {
+            find: function(options) {
+                return grunt.file.expand({
+                    cwd: options.srcDir
+                }, '**/meta/*.json');
+            },
+            read: function(options, files) {
                 files.map(function(filepath) {
-                    var filecontent = grunt.file.read(cwd + '/' + filepath),
-                        meta = JSON.parse(filecontent);
+                    var metaPath = libpath.join(options.srcDir, filepath),
+                        meta = JSON.parse(grunt.file.read(metaPath));
 
                     Object.keys(meta).forEach(function(module) {
                         if (meta[module].submodules) {
@@ -49,21 +54,10 @@ module.exports = function(grunt) {
             },
             set: function(module, config) {
                 this.metaConfig[module] = config;
-            },
-            toString: function(spaces, module) {
-                if (typeof spaces === 'string') {
-                    module = spaces;
-                }
-
-                if (typeof spaces !== 'number') {
-                    spaces = options.spaces;
-                }
-
-                return JSON.stringify(this.get(module), null, spaces);
             }
         },
         template = {
-            init: function(name, filepath) {
+            init: function(options, name, filepath) {
                 var content = grunt.file.read(filepath);
 
                 // create template handler.
@@ -85,7 +79,7 @@ module.exports = function(grunt) {
             }
         },
         module = {
-            read: function(cwd, files) {
+            read: function(options, cwd, files) {
                 var content = [];
             
                 // append all module the files together
@@ -97,22 +91,22 @@ module.exports = function(grunt) {
 
                 return content.join('\n');
             },
-            wrap: function(moduleName, content) {
+            wrap: function(options, moduleName, content) {
                 // wrap module
                 return template.wrapModule({
                     script: content,
                     name: moduleName,
-                    meta: metaConfig.toString(moduleName),
+                    meta: JSON.stringify(metaConfig.get(moduleName), null, options.spaces),
                     version: options.version
                 });
             },
-            write: function(moduleName, content) {
+            write: function(options, moduleName, content) {
                 // Write joined contents to destination filepath.
                 var destPath = libpath.join(options.buildDir, moduleName, moduleName + '.js');
                 grunt.log.writeln('Writing file: %s', destPath);
                 grunt.file.write(destPath, content);
             }, 
-            findBuildFiles: function() {
+            find: function(options) {
                 return grunt.file.expand({
                         cwd: options.srcDir
                     }, '**/build.json');
@@ -125,20 +119,17 @@ module.exports = function(grunt) {
                 configContent;
 
             // read the config
-            files = grunt.file.expand({
-                cwd: options.srcDir
-            }, '**/meta/*.json');
-
-            metaConfig.read(options.srcDir, files);
+            files = metaConfig.find(options);
+            metaConfig.read(options, files);
 
             // wrap meta in the config.
             configContent = template.wrapConfig({
-                meta: metaConfig.toString(options.spaces)
+                meta: JSON.stringify(metaConfig.get(), null, options.spaces)
             });
             grunt.file.write(options.buildDir + '/config.js', configContent);
         },
         writeModules = function(grunt, options) {
-            var files = module.findBuildFiles();
+            var files = module.find(options);
 
             // read the config
             files.forEach(function(buildFile) {
@@ -154,10 +145,10 @@ module.exports = function(grunt) {
 
                 // loop through modules to build
                 Object.keys(build.builds).forEach(function(moduleName) {
-                    var content = module.read(buildPath, build.builds[moduleName].jsfiles);
+                    var content = module.read(options, buildPath, build.builds[moduleName].jsfiles);
 
-                    content = module.wrap(moduleName, content);
-                    module.write(moduleName, content);
+                    content = module.wrap(options, moduleName, content);
+                    module.write(options, moduleName, content);
                 }, this);
             }, this);
         };
