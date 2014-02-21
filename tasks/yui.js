@@ -22,8 +22,15 @@ module.exports = function(grunt) {
                     var filecontent = grunt.file.read(cwd + '/' + filepath),
                         meta = JSON.parse(filecontent);
 
-                    Object.keys(meta).forEach(function(key) {
-                        this.set(key, meta[key]);
+                    Object.keys(meta).forEach(function(module) {
+                        if (meta[module].submodules) {
+                            Object.keys(meta[module].submodules).forEach(function(submodule) {
+                                this.set(submodule, meta[module].submodules[submodule]);
+                            }, this);
+                        }
+                        else {
+                            this.set(module, meta[module]);
+                        }
                     }, this);
                 }, this);
                 return this.get();
