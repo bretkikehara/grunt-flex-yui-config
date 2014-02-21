@@ -9,12 +9,17 @@
 module.exports = function(grunt) {
     "use strict";
 
-    var liboptions = require(__dirname + '/options.js'),
-        libprecompile = require(__dirname + '/precompile.js'),
-        libfilter = require(__dirname + '/filter.js'),
-        libpath = require('path'),
+    var libpath = require('path'),
         libutil = require('util'),
         Handlebars = require('handlebars'),
+        options = {
+            buildDir: 'build',
+            srcDir: 'src',
+            version: 'dev',
+            spaces: 2,
+            configWrapper: __dirname + '/template/config-wrapper.hbs',
+            moduleWrapper: __dirname + '/template/module-wrapper.hbs'
+        },
         metaConfig = {
             metaConfig: {},
             read: function(cwd, files) {
@@ -112,13 +117,6 @@ module.exports = function(grunt) {
                         cwd: options.srcDir
                     }, '**/build.json');
             }
-        },
-        options = {
-            buildDir: 'build',
-            srcDir: 'src',
-            spaces: 2,
-            configWrapper: __dirname + '/template/config-wrapper.hbs',
-            moduleWrapper: __dirname + '/template/module-wrapper.hbs'
         };
 
 
