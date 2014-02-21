@@ -35,14 +35,26 @@ module.exports = function(grunt) {
                 }, this);
                 return this.get();
             },
-            get: function() {
+            get: function(module) {
+
+                if (module) {
+                    return this.metaConfig[module];
+                }
                 return this.metaConfig;
             },
-            set: function(key, value) {
-                this.metaConfig[key] = value;
+            set: function(module, config) {
+                this.metaConfig[module] = config;
             },
-            toString: function(spaces) {
-                return JSON.stringify(this.metaConfig, null, spaces);
+            toString: function(spaces, module) {
+                if (typeof spaces === 'string') {
+                    module = spaces;
+                }
+
+                if (typeof spaces !== 'number') {
+                    spaces = options.spaces;
+                }
+
+                return JSON.stringify(this.get(module), null, spaces);
             }
         },
         template = {
@@ -54,9 +66,51 @@ module.exports = function(grunt) {
                     return null;
                 }
 
+                if (name === 'init') {
+                    grunt.log.error("The init function cannot be overridden!");
+                    return null;
+                }
+                else if (this[name]) {
+                    grunt.log.warn("The %s will be overridden", name);
+                }
+
                 this[name] = Handlebars.compile(Handlebars.parse(content));
 
                 return this[name];
+            }
+        },
+        module = {
+            read: function(cwd, files) {
+                var content = [];
+            
+                // append all module the files together
+                files.forEach(function(jsfile) {
+                    var data = grunt.file.read(libpath.join(cwd, 'js', jsfile));
+                    grunt.log.writeln('Reading module: %s', jsfile);
+                    content.push(data);
+                }, this);
+
+                return content.join('\n');
+            },
+            wrap: function(moduleName, content) {
+                // wrap module
+                return template.wrapModule({
+                    script: content,
+                    name: moduleName,
+                    meta: metaConfig.toString(moduleName),
+                    version: options.version
+                });
+            },
+            write: function(moduleName, content) {
+                // Write joined contents to destination filepath.
+                var destPath = libpath.join(options.buildDir, moduleName, moduleName + '.js');
+                grunt.log.writeln('Writing file: %s', destPath);
+                grunt.file.write(destPath, content);
+            }, 
+            findBuildFiles: function() {
+                return grunt.file.expand({
+                        cwd: options.srcDir
+                    }, '**/build.json');
             }
         },
         options = {
