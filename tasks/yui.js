@@ -13,7 +13,20 @@ module.exports = function(grunt) {
         libprecompile = require(__dirname + '/precompile.js'),
         libfilter = require(__dirname + '/filter.js'),
         libpath = require('path'),
-        libutil = require('util');
+        libutil = require('util'),
+        getMetaConfig = function(files) {
+            var metaConfig = {};
+            files.map(function(filepath) {
+                var filecontent = grunt.file.read(filepath),
+                    meta = JSON.parse(filecontent),
+                    key;
+
+                for (key in meta) {
+                    metaConfig[key] = meta[key];
+                }
+            }, this);
+            return metaConfig;
+        };
 
     grunt.registerMultiTask(
         'yui-meta',
@@ -31,18 +44,8 @@ module.exports = function(grunt) {
             */
             if (this.files && this.files.length > 0) {
                 this.files.forEach(function(file) {
-                    var metaConfig = {};
-
                     // store the meta data in the modules object.
-                    file.src.map(function(filepath) {
-                        var filecontent = grunt.file.read(filepath),
-                            meta = JSON.parse(filecontent),
-                            key;
-
-                        for (key in meta) {
-                            metaConfig[key] = meta[key];
-                        }
-                    }, this);
+                    var metaConfig = getMetaConfig.call(this, file.src);
 
                     // Write joined contents to destination filepath.
                     grunt.file.write(file.dest, JSON.stringify(metaConfig, null, options.space));
