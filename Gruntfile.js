@@ -23,32 +23,11 @@ module.exports = function(grunt) {
                 'tests/test-*.js'
             ]
         },
-        'yui-meta': {
-            test: {
-                files: [{
-                    'tests/build/config-meta.json': [
-                        'tests/src/**/meta/*.json'
-                    ]
-                }]
-            }
-        },
-        'yui-config': {
-            test: {
-                files: [{
-                    'tests/build/config.js': [
-                        'tests/build/config-meta.json'
-                    ]
-                }]
-            }
-        },
-        'yui-build': {
-            test: {
-                files: [{
-                    expand: false,
-                    cwd: 'tests',
-                    src: 'src/**/build.json',
-                    dest: 'tests/build/'
-                }]
+        yui: {
+            options: {
+                buildDir: 'tests/build',
+                srcDir: 'tests/src',
+                space: 4
             }
         }
     });
@@ -58,12 +37,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
-    grunt.registerTask('test', [
-        'yui-meta',
-        'yui-config',
-        'yui-build',
-        'nodeunit'
-    ]);
     grunt.registerTask('default', [
         'jshint',
         'test'
