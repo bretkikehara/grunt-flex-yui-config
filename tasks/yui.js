@@ -120,34 +120,65 @@ module.exports = function(grunt) {
         };
 
 
-    grunt.registerTask('yui-config', function() {
-        var files,
-            configContent;
+    var writeConfig = function(grunt, options) {
+            var files,
+                configContent;
 
-        // read the config
-        files = grunt.file.expand({
-            cwd: options.srcDir
-        }, '**/meta/*.json');
+            // read the config
+            files = grunt.file.expand({
+                cwd: options.srcDir
+            }, '**/meta/*.json');
 
-        metaConfig.read(options.srcDir, files);
+            metaConfig.read(options.srcDir, files);
 
-        // wrap meta in the config.
-        configContent = template.wrapConfig({
-            meta: metaConfig.toString(options.spaces)
-        });
-        grunt.file.write(options.buildDir + '/config.js', configContent);
-    });
+            // wrap meta in the config.
+            configContent = template.wrapConfig({
+                meta: metaConfig.toString(options.spaces)
+            });
+            grunt.file.write(options.buildDir + '/config.js', configContent);
+        },
+        writeModules = function(grunt, options) {
+            var files = module.findBuildFiles();
+
+            // read the config
+            files.forEach(function(buildFile) {
+                var build,
+                    buildPath;
+
+                // build.json file and path.
+                buildFile = libpath.join(options.srcDir, buildFile);
+                buildPath = libpath.dirname(buildFile)
+
+                grunt.log.writeln('Reading build: %s', buildFile);
+                build = JSON.parse(grunt.file.read(buildFile));
+
+                // loop through modules to build
+                Object.keys(build.builds).forEach(function(moduleName) {
+                    var content = module.read(buildPath, build.builds[moduleName].jsfiles);
+
+                    content = module.wrap(moduleName, content);
+                    module.write(moduleName, content);
+                }, this);
+            }, this);
+        };
 
     grunt.registerTask('yui',
         'Defines the YUI task',
-        function() {
+        function(phase) {
             // write to global options
             options = this.options(options);
 
             template.init('wrapConfig', options.configWrapper);
             template.init('wrapModule', options.moduleWrapper);
 
-            grunt.task.run('yui-config');
+            // run task phases.
+            if (phase === 'config') {
+                writeConfig(grunt, options);
+            }
+            else {
+                writeConfig(grunt, options);
+                writeModules(grunt, options);
+            }
         }
     );
 };
