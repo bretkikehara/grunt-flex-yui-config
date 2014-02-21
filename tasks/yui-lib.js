@@ -1,5 +1,3 @@
-
-
 module.exports = function(grunt) {
 
     var libpath = require('path'),
@@ -133,6 +131,31 @@ module.exports = function(grunt) {
                 grunt.log.debug('Meta Content');
                 grunt.file.write(options.buildDir + '/config.js', configContent);
             },
+            writeModule: function(options, buildFile) {
+                var build,
+                    buildPath;
+
+                // build.json file and path.
+                buildFile = libpath.join(options.srcDir, buildFile);
+                buildPath = libpath.dirname(buildFile)
+
+                grunt.log.writeln('Reading build: %s', buildFile);
+                build = JSON.parse(grunt.file.read(buildFile));
+
+                // loop through modules to build
+                Object.keys(build.builds).forEach(function(moduleName) {
+                    var content = this.module.read(options, buildPath, build.builds[moduleName].jsfiles);
+
+                    content = this.template.wrapModule({
+                        script: content,
+                        name: moduleName,
+                        meta: JSON.stringify(lib.config.get(moduleName), null, options.spaces),
+                        version: options.version
+                    });
+
+                    this.module.write(options, moduleName, content);
+                }, this);
+            },
             writeModules: function(options) {
                 var files = this.module.find(options);
 
@@ -140,29 +163,7 @@ module.exports = function(grunt) {
 
                 // read the config
                 files.forEach(function(buildFile) {
-                    var build,
-                        buildPath;
-
-                    // build.json file and path.
-                    buildFile = libpath.join(options.srcDir, buildFile);
-                    buildPath = libpath.dirname(buildFile)
-
-                    grunt.log.writeln('Reading build: %s', buildFile);
-                    build = JSON.parse(grunt.file.read(buildFile));
-
-                    // loop through modules to build
-                    Object.keys(build.builds).forEach(function(moduleName) {
-                        var content = this.module.read(options, buildPath, build.builds[moduleName].jsfiles);
-
-                        content = this.template.wrapModule({
-                            script: content,
-                            name: moduleName,
-                            meta: JSON.stringify(lib.config.get(moduleName), null, options.spaces),
-                            version: options.version
-                        });
-
-                        this.module.write(options, moduleName, content);
-                    }, this);
+                    this.writeModule(options, buildFile);
                 }, this);
             }
         };
