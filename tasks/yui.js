@@ -14,18 +14,28 @@ module.exports = function(grunt) {
         libfilter = require(__dirname + '/filter.js'),
         libpath = require('path'),
         libutil = require('util'),
-        getMetaConfig = function(files) {
-            var metaConfig = {};
-            files.map(function(filepath) {
-                var filecontent = grunt.file.read(filepath),
-                    meta = JSON.parse(filecontent),
-                    key;
+        metaConfig = {
+            metaConfig: {},
+            read: function(cwd, files) {
+                files.map(function(filepath) {
+                    var filecontent = grunt.file.read(cwd + '/' + filepath),
+                        meta = JSON.parse(filecontent);
 
-                for (key in meta) {
-                    metaConfig[key] = meta[key];
-                }
-            }, this);
-            return metaConfig;
+                    Object.keys(meta).forEach(function(key) {
+                        this.set(key, meta[key]);
+                    }, this);
+                }, this);
+                return this.get();
+            },
+            get: function() {
+                return this.metaConfig;
+            },
+            set: function(key, value) {
+                this.metaConfig[key] = value;
+            },
+            toString: function(spaces) {
+                return JSON.stringify(this.metaConfig, null, spaces);
+            }
         };
 
     grunt.registerMultiTask(
