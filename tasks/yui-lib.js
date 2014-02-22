@@ -187,64 +187,60 @@ module.exports = function(grunt) {
                 init: function(options, files) {
                     files.forEach(function(buildFile) {
                         var name = this.getModuleName(buildFile),
-                            build;
+                            buildPath;
 
                         grunt.log.debug("Caching file: %s", name);
 
                         // store module data in memory.
-                        buildFile = libpath.join(options.srcDir, buildFile);
-                        this.modules[name] = JSON.parse(grunt.file.read(buildFile));
+                        buildPath = libpath.join(options.srcDir, buildFile);
+                        this.modules[name] = JSON.parse(grunt.file.read(buildPath));
                         this.modules[name].mtime = 0;
+                        this.modules[name].buildFile = buildFile;
                     }, this);
                 },
                 getModuleName: function(buildFile) {
                     return MODULE_REGEX.exec(buildFile)[1];
                 },
+                shouldBuild: function(options, moduleName) {
+                    var module = this.modules[moduleName],
+                        buildFile = libpath.join(options.srcDir, module.buildFile),
+                        stats = libfs.statSync(buildFile),
+                        time = stats.mtime.getTime();
+
+                    return time > module.mtime;
+                },
                 compile: function(options, moduleName) {
-                    var buildFile = libpath.join(options.srcDir, moduleName, "build.json"),
-                        module = this.modules[moduleName];
+                    var module = this.modules[moduleName],
+                        buildFile = libpath.join(options.srcDir, module.buildFile),
+                        stats,
+                        time;
 
                     grunt.log.debug('Reading build file: %s', buildFile);
-                    libfs.stat(buildFile, function(err, stats) {
-                        var time,
-                            shouldBuild;
 
-                        grunt.log.debug('Reading build file stats: %s', moduleName);
-
-                        if (err) {
-                            grunt.log.warn('Failed to look at file stats: %s', buildFile);
-                            return;
+                    // check last modified time is different
+                    if (this.shouldBuild(options, moduleName)) {
+                        // build prepend modules
+                        if (module.prebuilds) {
+                            module.prebuilds.forEach(function(prebuildModule) {
+                                grunt.log.debug('Prepend: %s', prebuildModule);
+                                this.compile(options, prebuildModule);
+                            }, this);
                         }
 
-                        // last modified time is different
-                        time = stats.getTime();
-                        shouldBuild = (time > module.mtime);
-
+                        // write module
                         // build the modules.
-                        grunt.log.debug('Build %s module? %s', moduleName, shouldBuild);
-                        if (shouldBuild) {
-                            _this.build(moduleName);
+                        grunt.log.debug('Module: %s', moduleName);
+
+                        // build append modules
+                        if (module.postbuilds) {
+                            module.postbuilds.forEach(function(postbuildModule) {
+                                grunt.log.debug('Prepend: %s', postbuildModule);
+                                this.compile(options, postbuildModule);
+                            }, this);
                         }
-                    });
-                },
-                build: function(moduleName) {
-                    this.modules[moduleName].mtime = time;
 
-                    // build prepend modules
-                    this.modules[moduleName].prebuilds.forEach(function(prebuildModule) {
-                        grunt.log.debug('Prepend: %s', prebuildModule);
-                        this.compile(options, prebuildModule);
-                    }, this);
-
-                    // write module
-                    // build the modules.
-                    grunt.log.debug('Module: %s', moduleName);
-
-                    // build append modules
-                    this.modules[moduleName].postbuilds.forEach(function(postbuildModule) {
-                        grunt.log.debug('Prepend: %s', postbuildModule);
-                        this.compile(options, postbuildModule);
-                    }, this);
+                        this.modules[moduleName].mtime = Date.now();
+                    }
                 }
             }
         };
