@@ -162,8 +162,8 @@ module.exports = function(grunt) {
 
                 // loop through modules to build
                 Object.keys(build.builds).forEach(function(moduleName) {
-                    writeModuleFiles(options, buildPath, build.builds[moduleName].jsfiles, 'js');
-                    writeModuleFiles(options, buildPath, build.builds[moduleName].cssfiles, 'css');
+                    this.writeModuleFiles(options, buildPath, moduleName,  build.builds[moduleName].jsfiles, 'js');
+                    this.writeModuleFiles(options, buildPath, moduleName,  build.builds[moduleName].cssfiles, 'css');
                 }, this);
             },
             writeModules: function(options) {
