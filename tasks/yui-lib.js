@@ -83,16 +83,16 @@ module.exports = function(grunt) {
                 
                     // append all module the files together
                     files.forEach(function(jsfile) {
-                        var data = grunt.file.read(libpath.join(cwd, 'js', jsfile));
+                        var data = grunt.file.read(libpath.join(cwd, jsfile));
                         grunt.log.writeln('Reading module: %s', jsfile);
                         content.push(data);
                     }, this);
 
                     return content.join('\n');
                 },
-                write: function(options, moduleName, content) {
+                write: function(options, moduleName, ext, content) {
                     // Write joined contents to destination filepath.
-                    var destPath = libpath.join(options.buildDir, moduleName, moduleName + '.js');
+                    var destPath = libpath.join(options.buildDir, moduleName, moduleName + '.' + ext);
                     grunt.log.writeln('Writing file: %s', destPath);
                     grunt.file.write(destPath, content);
                 }, 
@@ -131,6 +131,23 @@ module.exports = function(grunt) {
                 grunt.log.debug('Meta Content');
                 grunt.file.write(options.buildDir + '/config.js', configContent);
             },
+            writeModuleFiles: function(options, buildPath, moduleName, files, ext) {
+                var content;
+
+                if (!files) {
+                    return null;
+                }
+
+                content = this.module.read(options, libpath.join(buildPath, ext), files);
+                content = this.template.wrapModule({
+                    script: content,
+                    name: moduleName,
+                    meta: JSON.stringify(lib.config.get(moduleName), null, options.spaces),
+                    version: options.version
+                });
+                
+                this.module.write(options, moduleName, ext, content);
+            },
             writeModule: function(options, buildFile) {
                 var build,
                     buildPath;
@@ -142,19 +159,16 @@ module.exports = function(grunt) {
                 grunt.log.writeln('Reading build: %s', buildFile);
                 build = JSON.parse(grunt.file.read(buildFile));
 
+                //TODO handle root properties: http://yui.github.io/shifter/#build.json-root
+
                 // loop through modules to build
                 Object.keys(build.builds).forEach(function(moduleName) {
-                    var content = this.module.read(options, buildPath, build.builds[moduleName].jsfiles);
-
-                    content = this.template.wrapModule({
-                        script: content,
-                        name: moduleName,
-                        meta: JSON.stringify(lib.config.get(moduleName), null, options.spaces),
-                        version: options.version
-                    });
-
-                    this.module.write(options, moduleName, content);
+                    //TODO need to handle the options: http://yui.github.io/shifter/#build.json-builds
+                    this.writeModuleFiles(options, buildPath, moduleName,  build.builds[moduleName].jsfiles, 'js');
+                    this.writeModuleFiles(options, buildPath, moduleName,  build.builds[moduleName].cssfiles, 'css');
                 }, this);
+
+                //TODO handle rollups: http://yui.github.io/shifter/#build.json-rollups
             },
             writeModules: function(options) {
                 var files = this.module.find(options);
