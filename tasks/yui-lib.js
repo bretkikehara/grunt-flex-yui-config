@@ -138,7 +138,6 @@ module.exports = function(grunt) {
                     return null;
                 }
 
-
                 content = this.module.read(options, libpath.join(buildPath, ext), files);
                 content = this.template.wrapModule({
                     script: content,
@@ -160,11 +159,16 @@ module.exports = function(grunt) {
                 grunt.log.writeln('Reading build: %s', buildFile);
                 build = JSON.parse(grunt.file.read(buildFile));
 
+                //TODO handle root properties: http://yui.github.io/shifter/#build.json-root
+
                 // loop through modules to build
                 Object.keys(build.builds).forEach(function(moduleName) {
+                    //TODO need to handle the options: http://yui.github.io/shifter/#build.json-builds
                     this.writeModuleFiles(options, buildPath, moduleName,  build.builds[moduleName].jsfiles, 'js');
                     this.writeModuleFiles(options, buildPath, moduleName,  build.builds[moduleName].cssfiles, 'css');
                 }, this);
+
+                //TODO handle rollups: http://yui.github.io/shifter/#build.json-rollups
             },
             writeModules: function(options) {
                 var files = this.module.find(options);
