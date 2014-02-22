@@ -1,8 +1,10 @@
 module.exports = function(grunt) {
 
-    var libpath = require('path'),
+    var libfs = require('fs'),
+        libpath = require('path'),
         libutil = require('util'),
         Handlebars = require('handlebars'),
+        MODULE_REGEX = /^([^\/]+)\/.+$/i,
         lib = {
             /*
             * Default options. Do NOT overwrite
@@ -159,8 +161,6 @@ module.exports = function(grunt) {
                 grunt.log.writeln('Reading build: %s', buildFile);
                 build = JSON.parse(grunt.file.read(buildFile));
 
-                //TODO handle root properties: http://yui.github.io/shifter/#build.json-root
-
                 // loop through modules to build
                 Object.keys(build.builds).forEach(function(moduleName) {
                     //TODO need to handle the options: http://yui.github.io/shifter/#build.json-builds
@@ -172,13 +172,80 @@ module.exports = function(grunt) {
             },
             writeModules: function(options) {
                 var files = this.module.find(options);
-
                 grunt.log.debug('Executing writeModules');
 
+                this.build.init(options, files);
+
                 // read the config
-                files.forEach(function(buildFile) {
-                    this.writeModule(options, buildFile);
+                Object.keys(this.build.modules).forEach(function(moduleName) {
+                    grunt.log.debug('Compiling module: %s', moduleName);
+                    this.build.compile(options, moduleName);
                 }, this);
+            },
+            build: {
+                modules: {},
+                init: function(options, files) {
+                    files.forEach(function(buildFile) {
+                        var name = this.getModuleName(buildFile),
+                            build;
+
+                        grunt.log.debug("Caching file: %s", name);
+
+                        // store module data in memory.
+                        buildFile = libpath.join(options.srcDir, buildFile);
+                        this.modules[name] = JSON.parse(grunt.file.read(buildFile));
+                        this.modules[name].mtime = 0;
+                    }, this);
+                },
+                getModuleName: function(buildFile) {
+                    return MODULE_REGEX.exec(buildFile)[1];
+                },
+                compile: function(options, moduleName) {
+                    var buildFile = libpath.join(options.srcDir, moduleName, "build.json"),
+                        module = this.modules[moduleName];
+
+                    grunt.log.debug('Reading build file: %s', buildFile);
+                    libfs.stat(buildFile, function(err, stats) {
+                        var time,
+                            shouldBuild;
+
+                        grunt.log.debug('Reading build file stats: %s', moduleName);
+
+                        if (err) {
+                            grunt.log.warn('Failed to look at file stats: %s', buildFile);
+                            return;
+                        }
+
+                        // last modified time is different
+                        time = stats.getTime();
+                        shouldBuild = (time > module.mtime);
+
+                        // build the modules.
+                        grunt.log.debug('Build %s module? %s', moduleName, shouldBuild);
+                        if (shouldBuild) {
+                            _this.build(moduleName);
+                        }
+                    });
+                },
+                build: function(moduleName) {
+                    this.modules[moduleName].mtime = time;
+
+                    // build prepend modules
+                    this.modules[moduleName].prebuilds.forEach(function(prebuildModule) {
+                        grunt.log.debug('Prepend: %s', prebuildModule);
+                        this.compile(options, prebuildModule);
+                    }, this);
+
+                    // write module
+                    // build the modules.
+                    grunt.log.debug('Module: %s', moduleName);
+
+                    // build append modules
+                    this.modules[moduleName].postbuilds.forEach(function(postbuildModule) {
+                        grunt.log.debug('Prepend: %s', postbuildModule);
+                        this.compile(options, postbuildModule);
+                    }, this);
+                }
             }
         };
     return lib;
