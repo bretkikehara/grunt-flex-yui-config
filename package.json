@@ -1,7 +1,7 @@
 {
   "name": "grunt-flex-yui-group",
   "description": "Creates a configuration for a YUI group.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/bretkikehara/grunt-flex-yui-group",
   "author": {
     "name": "Bret K. Ikehara",

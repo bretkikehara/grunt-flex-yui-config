@@ -1,4 +1,4 @@
-# grunt-flex-yui-group v0.0.1
+# grunt-flex-yui-group v0.0.2
 
 > Creates a configuration for a YUI group. First party support for this option can be found in `Shifter` or `Yogi`, but this tool provides an alternative method of working with a YUI repository.
 
@@ -32,9 +32,25 @@ Task targets, files and options may be specified according to the grunt [Configu
 
 ### Options
 
+#### buildDir
+Type: `String`
+Default: 'build'
 
+Defines the path the compiled modules should be written.
 
+#### srcDir
+Type: `String`
+Default: 'src'
+
+Defines the path the modules' source folder.
+
+#### spaces
+Type: `Number`
+Default: 2
+
+Defines the number of spaces to use to format the JSON. Please look at the [JSON.stringify](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) function for more information.
 
 ## Release History
  
+ * 2014-02-20   v0.0.2   Added option to build jsfiles and cssfiles.
  * 2014-02-13   v0.0.1   Refactored the code to be more modular.
