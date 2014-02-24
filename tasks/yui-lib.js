@@ -191,7 +191,6 @@ module.exports = function(grunt) {
             },
             getModuleName: function(buildFile) {
                 return MODULE_NAME_REGEX.exec(buildFile)[1];
-                return MODULE_NAME_REGEX.exec(buildFile)[1];
             },
             shouldBuild: function(options, moduleName) {
                 var module = this.modules[moduleName],
