@@ -109,6 +109,9 @@ module.exports = function(grunt) {
             }
         },
         module = {
+            getName: function(path) {
+                return MODULE_NAME_REGEX.exec(path)[1];
+            },
             read: function(options, cwd, files, ext) {
                 var content = [];
             
@@ -174,23 +177,33 @@ module.exports = function(grunt) {
             }
         },
         modules = {
-            buildCache: {},
-            init: function(options, files) {
-                files.forEach(function(buildFile) {
-                    var name = this.getModuleName(buildFile),
-                        buildPath;
+            buildCache: null,
+            /**
+            * Initializes the build.json cache.
+            */
+            init: function(options) {
+                var files = module.find(options);
 
-                    grunt.log.debug("Caching file: %s", name);
-
-                    // store module data in memory.
-                    buildPath = libpath.join(options.srcDir, buildFile);
-                    this.buildCache[name] = JSON.parse(grunt.file.read(buildPath));
-                    this.buildCache[name].mtime = 0;
-                    this.buildCache[name].buildFile = buildFile;
-                }, this);
+                // only need to build the cache once.
+                if (!this.buildCache) {
+                    this.buildCache = {};
+                    files.forEach(function(buildFile) {
+                        this.updateCache(options, buildFile);
+                    }, this);
+                }
             },
-            getModuleName: function(buildFile) {
-                return MODULE_NAME_REGEX.exec(buildFile)[1];
+            updateCache: function(options, buildFile, mtime) {
+                var name = module.getName(buildFile),
+                    buildPath;
+
+                grunt.log.debug("Updating module cache: %s", name);
+
+                // store module data in memory.
+                buildPath = libpath.join(options.srcDir, buildFile);
+                this.buildCache[name] = JSON.parse(grunt.file.read(buildPath));
+                this.buildCache[name].mtime = (mtime) ? mtime : 0;
+                this.buildCache[name].buildFile = buildFile;
+
             },
             shouldBuild: function(options, moduleName) {
                 var module = this.buildCache[moduleName],
@@ -201,11 +214,9 @@ module.exports = function(grunt) {
                 return time > module.mtime;
             },
             compile: function(options) {
-                var files = module.find(options);
-
                 grunt.log.debug('Executing writeModules');
 
-                this.init(options, files);
+                this.init(options);
 
                 // read the config
                 Object.keys(this.buildCache).forEach(function(moduleName) {
