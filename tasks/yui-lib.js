@@ -205,13 +205,17 @@ module.exports = function(grunt) {
                 this.buildCache[name].buildFile = buildFile;
 
             },
-            shouldBuild: function(options, moduleName) {
-                var module = this.buildCache[moduleName],
-                    buildFile = libpath.join(options.srcDir, module.buildFile),
-                    stats = libfs.statSync(buildFile),
-                    time = stats.mtime.getTime();
+            shouldBuild: function(options, moduleName, buildFile) {
+                var buildFile,
+                    stats;
 
-                return time > module.mtime;
+                    if (!buildFile) {
+                        buildFile = libpath.join(options.srcDir, this.buildCache[moduleName].buildFile);
+                    }
+
+                    stats = libfs.statSync(buildFile);
+
+                return stats.mtime.getTime() > this.buildCache[moduleName].mtime;
             },
             compile: function(options) {
                 grunt.log.debug('Executing writeModules');
@@ -233,7 +237,7 @@ module.exports = function(grunt) {
                 grunt.log.debug('Reading build file: %s', buildFile);
 
                 // check last modified time is different
-                if (this.shouldBuild(options, moduleName)) {
+                if (this.shouldBuild(options, moduleName, buildFile)) {
                     // build prepend modules
                     if (buildProp.prebuilds) {
                         buildProp.prebuilds.forEach(function(prebuildModule) {
