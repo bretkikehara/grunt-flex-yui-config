@@ -25,7 +25,7 @@ module.exports = function(grunt) {
             }
             else {
                 lib.config.write(options);
-                lib.build.compileModules(options);
+                lib.modules.compile(options);
             }
         }
     );

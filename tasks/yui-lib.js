@@ -173,8 +173,8 @@ module.exports = function(grunt) {
                 }, this);
             }
         },
-        build = {
-            modules: {},
+        modules = {
+            buildCache: {},
             init: function(options, files) {
                 files.forEach(function(buildFile) {
                     var name = this.getModuleName(buildFile),
@@ -184,23 +184,23 @@ module.exports = function(grunt) {
 
                     // store module data in memory.
                     buildPath = libpath.join(options.srcDir, buildFile);
-                    this.modules[name] = JSON.parse(grunt.file.read(buildPath));
-                    this.modules[name].mtime = 0;
-                    this.modules[name].buildFile = buildFile;
+                    this.buildCache[name] = JSON.parse(grunt.file.read(buildPath));
+                    this.buildCache[name].mtime = 0;
+                    this.buildCache[name].buildFile = buildFile;
                 }, this);
             },
             getModuleName: function(buildFile) {
                 return MODULE_NAME_REGEX.exec(buildFile)[1];
             },
             shouldBuild: function(options, moduleName) {
-                var module = this.modules[moduleName],
+                var module = this.buildCache[moduleName],
                     buildFile = libpath.join(options.srcDir, module.buildFile),
                     stats = libfs.statSync(buildFile),
                     time = stats.mtime.getTime();
 
                 return time > module.mtime;
             },
-            compileModules: function(options) {
+            compile: function(options) {
                 var files = module.find(options);
 
                 grunt.log.debug('Executing writeModules');
@@ -208,13 +208,13 @@ module.exports = function(grunt) {
                 this.init(options, files);
 
                 // read the config
-                Object.keys(this.modules).forEach(function(moduleName) {
+                Object.keys(this.buildCache).forEach(function(moduleName) {
                     grunt.log.debug('Compiling module: %s', moduleName);
-                    this.compileModule(options, moduleName);
+                    this._compile(options, moduleName);
                 }, this);
             },
-            compileModule: function(options, moduleName) {
-                var buildProp = this.modules[moduleName],
+            _compile: function(options, moduleName) {
+                var buildProp = this.buildCache[moduleName],
                     buildFile = libpath.join(options.srcDir, buildProp.buildFile),
                     stats,
                     time;
@@ -227,7 +227,7 @@ module.exports = function(grunt) {
                     if (buildProp.prebuilds) {
                         buildProp.prebuilds.forEach(function(prebuildModule) {
                             grunt.log.debug('Prepend: %s', prebuildModule);
-                            this.compileModule(options, prebuildModule);
+                            this._compile(options, prebuildModule);
                         }, this);
                     }
 
@@ -242,21 +242,21 @@ module.exports = function(grunt) {
                     if (buildProp.postbuilds) {
                         buildProp.postbuilds.forEach(function(postbuildModule) {
                             grunt.log.debug('Prepend: %s', postbuildModule);
-                            this.compileModule(options, postbuildModule);
+                            this._compile(options, postbuildModule);
                         }, this);
                     }
 
                     // TODO handle rollups
 
                     // update build time.
-                    this.modules[moduleName].mtime = Date.now();
+                    this.buildCache[moduleName].mtime = Date.now();
                 }
             }
         };
     return {
         options: options,
-        build: build,
         template: template,
+        modules: modules,
         module: module,
         config: config
     };
