@@ -9,6 +9,18 @@ GLOBAL.YUI = {
 }
 
 exports.options = {
+    parseMeta: function(test) {
+        var filepath = __dirname + '/build/config-meta.json';
+
+        test.expect(2);
+        readConfig(filepath, function(err, data) {
+            actual = JSON.parse(data);
+            test.equal(actual['star-overlay'].requires.length, 4, 'Length is 4');
+            test.equal(actual['star-overlay'].requires[0], 'overlay', 'First module is overly');
+
+            test.done();
+        });
+    },
 	parseConfig: function (test) {
 		var modules = [
 			'star-plugin',

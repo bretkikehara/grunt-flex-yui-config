@@ -4,7 +4,7 @@ module.exports = function(grunt) {
         libpath = require('path'),
         libutil = require('util'),
         Handlebars = require('handlebars'),
-        FILE_NAME_REGEX = = /^(.+\/)?([^\/]+\.[^\/]+)+$/i,,
+        FILE_NAME_REGEX = /^(.+\/)?([^\/]+\.[^\/]+)+$/i,
         MODULE_NAME_REGEX = /^([^\/]+)\/.+$/i,
         MODULE_EXT_REGEX = /^[^\/]+/i,
         /*
@@ -122,7 +122,7 @@ module.exports = function(grunt) {
                         grunt.log.debug('Caching file: %s', filename);
                         fileCache[filename] = {
                             content: grunt.file.read(path),
-                            
+
                         };
                     }, this);
                 }, this);
@@ -147,7 +147,7 @@ module.exports = function(grunt) {
             },
             write: function(options, moduleName, prop) {
 
-                
+
 
             }
         },
