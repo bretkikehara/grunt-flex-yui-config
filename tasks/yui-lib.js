@@ -4,6 +4,7 @@ module.exports = function(grunt) {
         libpath = require('path'),
         libutil = require('util'),
         Handlebars = require('handlebars'),
+        FILE_NAME_REGEX = = /^(.+\/)?([^\/]+\.[^\/]+)+$/i,,
         MODULE_NAME_REGEX = /^([^\/]+)\/.+$/i,
         MODULE_EXT_REGEX = /^[^\/]+/i,
         /*
@@ -108,164 +109,126 @@ module.exports = function(grunt) {
                 return this[name];
             }
         },
+        submodule = {
+            compile: function(options, moduleName, prop) {
+                var fileCache = {};
+                
+                // precache the files.
+                Object.keys(prop.builds).forEach(function(submoduleName) {
+                    prop.builds[submoduleName].jsfiles.forEach(function(jsfile) {
+                        var filename = FILE_NAME_REGEX.exec(jsfile)[2],
+                            path = libpath.join(options.src, 'js', filename);
+
+                        grunt.log.debug('Caching file: %s', filename);
+                        fileCache[filename] = {
+                            content: grunt.file.read(path),
+                            
+                        };
+                    }, this);
+                }, this);
+
+                // joins the content together.
+                Object.keys(prop.builds).forEach(function(submoduleName) {
+                    var moduleContent = [];
+                    prop.builds[submoduleName].jsfiles.forEach(function(jsfile) {
+                        var filename = FILE_NAME_REGEX.exec(jsfile)[2];
+                        moduleContent.push(fileCache[filename]);
+                    }, this);
+
+                    // create the content
+                    moduleContent = moduleContent.join('\n');
+                    Object.keys(prop.builds[submoduleName].replace).forEach(function(key, value) {
+                        moduleContent = moduleContent.replace(key, value);
+                    }, this);
+
+                    // cache content
+                    prop.builds[submoduleName].content = moduleContent;
+                }, this);
+            },
+            write: function(options, moduleName, prop) {
+
+                
+
+            }
+        },
         module = {
             getName: function(path) {
                 return MODULE_NAME_REGEX.exec(path)[1];
             },
-            read: function(options, cwd, files, ext) {
-                var content = [];
-            
-                // append all module the files together
-                files.forEach(function(filePath) {
-                    var data,
-                        matchList = MODULE_EXT_REGEX.exec(filePath);
+            compile: function(options, moduleName) {
+                var prop = buildProperties.get(moduleName);
+                
+                grunt.log.debug('Building module: %s', moduleName);
 
-                    if (!matchList || matchList.length < 1 || ext !== matchList[0]) {
-                        filePath = libpath.join(ext, filePath);
-                    }
-                    filePath = libpath.join(cwd, filePath);
+                // build prepend modules
+                if (prop.prebuilds) {
+                    prop.prebuilds.forEach(function(prebuildModule) {
+                        var prop = buildProperties.get(prebuildModule);
+                        grunt.log.debug('Prepend: %s', prebuildModule);
+                        this.compile(options, prop);
+                    }, this);
+                }
 
-                    grunt.log.debug('Reading module: %s', filePath);    
-                    data = grunt.file.read(filePath);   
-                    content.push(data);
-                }, this);
+                // compiles the submodules.
+                submodule.compile(options, moduleName, prop);
+                submodule.write(options, moduleName, prop);
 
-                return content.join('\n');
+                // build append modules
+                if (prop.postbuilds) {
+                    prop.postbuilds.forEach(function(postbuildModule) {
+                        var prop = buildProperties.get(postbuildModule);
+                        grunt.log.debug('Append: %s', postbuildModule);
+                        this.compile(options, prop);
+                    }, this);
+                }
+            }
+        },
+        buildProperties = {
+            cache: null,
+            init: function(options) {
+                var buildFiles = this.find(options);
+
+                if (!this.cache) {
+                    // build the build.json cache
+                    this.cache = {};
+                    buildFiles.forEach(function(buildFile) {
+                        buildFile = libpath.join(options.srcDir, buildProp.buildFile);
+                        this.update(options, buildFile);
+                    }, this);
+                }
             },
             find: function(options) {
                 return grunt.file.expand({
                         cwd: options.srcDir
                     }, '**/build.json');
             },
-            _write: function(options, buildPath, moduleName, files, ext) {
-                var content,
-                    destPath;
+            update: function(options, buildFile) {
+                var moduleName = module.getName(buildFile);
 
-                if (!files) {
-                    return null;
-                }
+                this.cache[moduleName] = JSON.parse(grunt.file.read(buildPath));
+                this.cache[moduleName].file = buildFile;
 
-                content = this.read(options, buildPath, files, ext);
-                content = template.wrapModule({
-                    script: content,
-                    name: moduleName,
-                    meta: JSON.stringify(config.get(moduleName), null, options.spaces),
-                    version: options.version
-                });
-
-                // Write joined contents to destination filepath.
-                destPath = libpath.join(options.buildDir, moduleName, moduleName + '.' + ext);
-                grunt.log.debug('Writing file: %s', destPath);
-                grunt.file.write(destPath, content);
-            },
-            write: function(options, buildFile) {
-                var build,
-                    buildPath;
-
-                // build.json file and path.
-                buildPath = libpath.dirname(buildFile)
-
-                grunt.log.debug('Reading build: %s', buildFile);
-                build = JSON.parse(grunt.file.read(buildFile));
-
-                // loop through modules to build
-                Object.keys(build.builds).forEach(function(moduleName) {
-                    //TODO need to handle the options: http://yui.github.io/shifter/#build.json-builds
-                    this._write(options, buildPath, moduleName, build.builds[moduleName].jsfiles, 'js');
-                    this._write(options, buildPath, moduleName, build.builds[moduleName].cssfiles, 'css');
+                // loop through the submodules
+                this.cache[moduleName].builds.forEach(function(submoduleName) {
+                    this.cache[moduleName].builds[submoduleName].mtime = 0;
                 }, this);
+            },
+            get: function(moduleName) {
+                return this.cache[moduleName];
+            },
+            each: function(handler, thisObj) {
+                Object.keys(this.cache).forEach(handler, thisObj || this);
             }
         },
         modules = {
-            buildCache: null,
-            /**
-            * Initializes the build.json cache.
-            */
-            init: function(options) {
-                var files = module.find(options);
-
-                // only need to build the cache once.
-                if (!this.buildCache) {
-                    this.buildCache = {};
-                    files.forEach(function(buildFile) {
-                        this.updateCache(options, buildFile);
-                    }, this);
-                }
-            },
-            updateCache: function(options, buildFile, mtime) {
-                var name = module.getName(buildFile),
-                    buildPath;
-
-                grunt.log.debug("Updating module cache: %s", name);
-
-                // store module data in memory.
-                buildPath = libpath.join(options.srcDir, buildFile);
-                this.buildCache[name] = JSON.parse(grunt.file.read(buildPath));
-                this.buildCache[name].mtime = (mtime) ? mtime : 0;
-                this.buildCache[name].buildFile = buildFile;
-
-            },
-            shouldBuild: function(options, moduleName, buildFile) {
-                var buildFile,
-                    stats;
-
-                    if (!buildFile) {
-                        buildFile = libpath.join(options.srcDir, this.buildCache[moduleName].buildFile);
-                    }
-
-                    stats = libfs.statSync(buildFile);
-
-                return stats.mtime.getTime() > this.buildCache[moduleName].mtime;
-            },
             compile: function(options) {
                 grunt.log.debug('Executing writeModules');
 
-                this.init(options);
+                buildProperties.init(options);
 
-                // read the config
-                Object.keys(this.buildCache).forEach(function(moduleName) {
-                    grunt.log.debug('Compiling module: %s', moduleName);
-                    this._compile(options, moduleName);
+                buildProperties.each(function(moduleName) {
+                    module.compile(options, moduleName);
                 }, this);
-            },
-            _compile: function(options, moduleName) {
-                var buildProp = this.buildCache[moduleName],
-                    buildFile = libpath.join(options.srcDir, buildProp.buildFile),
-                    stats,
-                    time;
-
-                grunt.log.debug('Reading build file: %s', buildFile);
-
-                // check last modified time is different
-                if (this.shouldBuild(options, moduleName, buildFile)) {
-                    // build prepend modules
-                    if (buildProp.prebuilds) {
-                        buildProp.prebuilds.forEach(function(prebuildModule) {
-                            grunt.log.debug('Prepend: %s', prebuildModule);
-                            this._compile(options, prebuildModule);
-                        }, this);
-                    }
-
-                    // TODO handle exec and copy
-
-                    // write module to disk.
-                    // TODO handle replace
-                    grunt.log.debug('Module: %s', moduleName);
-                    module.write(options, buildFile);
-
-                    // build append modules
-                    if (buildProp.postbuilds) {
-                        buildProp.postbuilds.forEach(function(postbuildModule) {
-                            grunt.log.debug('Prepend: %s', postbuildModule);
-                            this._compile(options, postbuildModule);
-                        }, this);
-                    }
-
-                    // TODO handle rollups
-
-                    // update build time.
-                    this.buildCache[moduleName].mtime = Date.now();
-                }
             }
         };
     return {
