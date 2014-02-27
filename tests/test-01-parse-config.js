@@ -1,5 +1,13 @@
 
-var fs = require('fs');
+var fs = require('fs'),
+	grunt = require('grunt'),
+	libpath = __dirname + '/../lib/yui-lib.js',
+	libyui = require(libpath)(grunt),
+	options = libyui.options;
+
+// set default options.
+options.srcDir = 'tests/src';
+options.buildDir = 'tests/build';
 
 GLOBAL.YUI = {
 	config: null,
@@ -9,18 +17,6 @@ GLOBAL.YUI = {
 };
 
 module.exports = {
-    parseMeta: function(test) {
-        var filepath = __dirname + '/build/config-meta.json';
-
-        test.expect(2);
-        readConfig(filepath, function(err, data) {
-            actual = JSON.parse(data);
-            test.equal(actual['star-overlay'].requires.length, 4, 'Length is 4');
-            test.equal(actual['star-overlay'].requires[0], 'overlay', 'First module is overly');
-
-            test.done();
-        });
-    },
 	parseConfig: function (test) {
 		var modules = [
 			'star-plugin',
@@ -28,6 +24,9 @@ module.exports = {
 			'star-panel',
 			'star-tooltip'
 		];
+
+        libyui.template.init(options);
+		libyui.config.write(options);
 
 		require(__dirname + '/build/config.js');
 
