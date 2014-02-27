@@ -1,8 +1,9 @@
 
 var fs = require('fs'),
 	grunt = require('grunt'),
-	libpath = __dirname + '/../lib/yui-lib.js',
-	libyui = require(libpath)(grunt),
+	libpath = require('path'),
+	libyuiPath = __dirname + '/../lib/yui-lib.js',
+	libyui = require(libyuiPath)(grunt),
 	options = libyui.options;
 	
 // set default options.
@@ -46,6 +47,41 @@ module.exports = {
 		});		
 		test.done();
 	},
+	updateFailure: function(test) {
+		var libyui = require(libyuiPath)(grunt);
+
+		test.expect(2);
+
+		// cache not initialized.
+		try {
+			libyui.buildProperties.update(options);
+		}
+		catch(e) {
+			test.equal(e.message, libyui.MESSAGE_CACHE_NOT_INITIALIZED);
+		}
+
+		// build file not defined.
+		libyui.buildProperties.cache = {};
+		try {
+			libyui.buildProperties.update(options);
+		}
+		catch(e) {
+			test.equal(e.message, libyui.MESSAGE_BUILD_FILE_UNDEFINED);
+		}
+
+		test.done();
+	},
+	update: function(test) {
+		var libyui = require(libyuiPath)(grunt),
+			buildFile = libpath.join(options.srcDir, "star-widget/build.json");
+
+		libyui.buildProperties.cache = {};
+		libyui.buildProperties.update(options, buildFile);
+
+        test.ok(libyui.buildProperties.cache['star-widget'], 'Has star-widget');
+
+		test.done();
+	},
 	init: function(test) {
 		var msg = 'Tests the build property cache',
 			module = 'star-widget',
@@ -54,10 +90,6 @@ module.exports = {
 		// initialize cache
         libyui.buildProperties.init(options);
         cache = libyui.buildProperties.cache;
-
-        // test module
-        test.ok(cache['star-widget'], 'Has star-widget');
-        test.ok(cache['star-widget-plugin'], 'Has star-widget');
 
         // check submodule modified time.
         Object.keys(cache).forEach(function(moduleName) {
