@@ -105,19 +105,25 @@ module.exports = {
 	},
 	init: function(test) {
 		var msg = 'Tests the build property cache',
-			module = 'star-widget',
-			cache;
+			moduleName = 'star-widget',
+			cache,
+			expected = {
+				'star-panel.js': true,
+				'star-overlay.js': true,
+				'star-tooltip.js': true
+			},
+			time = Date.now();
 
 		// initialize cache
         libyui.buildProperties.init(options);
         cache = libyui.buildProperties.cache;
 
         // check submodule modified time.
-        Object.keys(cache).forEach(function(moduleName) {
-            Object.keys(cache[moduleName].builds).forEach(function(submoduleName) {
-                test.equals(cache[moduleName].builds[submoduleName].mtime, 0, 'Default modified time');
-            }, this);
-        });
+        Object.keys(cache[moduleName].jsfiles).forEach(function(jsfile) {
+            test.ok(expected[jsfile], "File info has been cached");
+            test.notEqual(cache[moduleName].jsfiles[jsfile].content, null, "File is in memory");
+            test.ok(cache[moduleName].jsfiles[jsfile].mtime > time, "Last modified time is stored");
+        }, this);
 
 		test.done();
 	}
