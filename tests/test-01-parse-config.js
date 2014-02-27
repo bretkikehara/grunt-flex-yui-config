@@ -6,7 +6,7 @@ GLOBAL.YUI = {
 	applyConfig: function(config) {
 		this.config = config;
 	}
-}
+};
 
 exports.options = {
     parseMeta: function(test) {
