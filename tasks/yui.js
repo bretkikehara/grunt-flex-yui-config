@@ -9,7 +9,7 @@
 module.exports = function(grunt) {
     "use strict";
 
-    var lib = require('./yui-lib.js')(grunt);
+    var lib = require(__dirname + '/../lib/yui-lib.js')(grunt);
 
     grunt.registerTask('yui',
         'Defines the YUI task',
