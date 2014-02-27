@@ -4,9 +4,7 @@ var fs = require('fs'),
 	libpath = __dirname + '/../lib/yui-lib.js',
 	libyui = require(libpath)(grunt),
 	options = libyui.options;
-
-grunt.option('debug', true);
-
+	
 // set default options.
 options.srcDir = 'tests/src';
 options.buildDir = 'tests/build';
