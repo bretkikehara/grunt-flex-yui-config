@@ -8,7 +8,7 @@ GLOBAL.YUI = {
 	}
 };
 
-exports.options = {
+module.exports = {
     parseMeta: function(test) {
         var filepath = __dirname + '/build/config-meta.json';
 
