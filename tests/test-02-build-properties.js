@@ -13,7 +13,7 @@ options.buildDir = 'tests/build';
 module.exports = {
 	getModuleName: function(test) {
 		var checkPath = function(filepath, expected) {
-				var actual = libyui.buildProperties.getName(filepath);
+				var actual = libyui.buildProperties.getModuleName(filepath);
 				test.equal(actual, expected, 'Module name should be found from path');
 			};
 
@@ -32,6 +32,27 @@ module.exports = {
 
 		test.done();
 	},
+	getFileName: function(test) {
+		var checkFile = function(filepath, expected) {
+				var actual = libyui.buildProperties.getFileName(filepath);
+				test.equal(actual, expected, 'Module name should be found from path');
+			};
+
+		// valid unix paths
+		checkFile('star-widget-plugin/build.json', 'build.json');
+		checkFile('/star-widget-plugin/build.json', 'build.json');
+		checkFile('./star-widget-plugin/build.json', 'build.json');
+
+		// valid windows paths
+		checkFile('star-widget-plugin\\build.json', 'build.json');
+		checkFile('\\star-widget-plugin\\build.json', 'build.json');
+		checkFile('.\\star-widget-plugin\\build.json', 'build.json');
+
+		// long path.
+		checkFile('tests/src/star-widget-plugin/build.json', 'build.json');
+
+		test.done();
+	},
 	find: function(test) {
 		var actual = libyui.buildProperties.find(options),
 			expected = {
@@ -40,21 +61,21 @@ module.exports = {
 			};
 
 		actual = actual.map(function(filepath) {
-			return libyui.buildProperties.getName(filepath);
+			return libyui.buildProperties.getModuleName(filepath);
 		});
 		actual.forEach(function(moduleName) {
 			test.ok(expected[moduleName], 'Modules are all found');
 		});		
 		test.done();
 	},
-	updateFailure: function(test) {
+	cacheBuildFileFailure: function(test) {
 		var libyui = require(libyuiPath)(grunt);
 
 		test.expect(2);
 
 		// cache not initialized.
 		try {
-			libyui.buildProperties.update(options);
+			libyui.buildProperties.cacheBuildFile(options);
 		}
 		catch(e) {
 			test.equal(e.message, libyui.MESSAGE_CACHE_NOT_INITIALIZED);
@@ -63,7 +84,7 @@ module.exports = {
 		// build file not defined.
 		libyui.buildProperties.cache = {};
 		try {
-			libyui.buildProperties.update(options);
+			libyui.buildProperties.cacheBuildFile(options);
 		}
 		catch(e) {
 			test.equal(e.message, libyui.MESSAGE_BUILD_FILE_UNDEFINED);
@@ -71,12 +92,12 @@ module.exports = {
 
 		test.done();
 	},
-	update: function(test) {
+	cacheBuildFile: function(test) {
 		var libyui = require(libyuiPath)(grunt),
 			buildFile = libpath.join(options.srcDir, "star-widget/build.json");
 
 		libyui.buildProperties.cache = {};
-		libyui.buildProperties.update(options, buildFile);
+		libyui.buildProperties.cacheBuildFile(options, buildFile);
 
         test.ok(libyui.buildProperties.cache['star-widget'], 'Has star-widget');
 
