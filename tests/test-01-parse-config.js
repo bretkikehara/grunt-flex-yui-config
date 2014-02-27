@@ -19,7 +19,9 @@ GLOBAL.YUI = {
 module.exports = {
 	parseConfig: function (test) {
 		var modules = [
-			'star-plugin',
+			'star-plugin-widget-visible-anim',
+			'star-plugin-widget-content-anim',
+			'star-plugin-widget-button-anim',
 			'star-overlay',
 			'star-panel',
 			'star-tooltip'

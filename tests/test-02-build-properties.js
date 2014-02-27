@@ -31,12 +31,25 @@ module.exports = {
 
 		test.done();
 	},
+	find: function(test) {
+		var actual = libyui.buildProperties.find(options),
+			expected = {
+				'star-widget': true,
+				'star-widget-plugin': true
+			};
+
+		actual = actual.map(function(filepath) {
+			return libyui.buildProperties.getName(filepath);
+		});
+		actual.forEach(function(moduleName) {
+			test.ok(expected[moduleName], 'Modules are all found');
+		});		
+		test.done();
+	},
 	init: function(test) {
 		var msg = 'Tests the build property cache',
 			module = 'star-widget',
 			cache;
-
-		console.log('Test build property cache');
 
 		// initialize cache
         libyui.buildProperties.init(options);
