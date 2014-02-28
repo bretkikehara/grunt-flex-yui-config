@@ -103,6 +103,26 @@ module.exports = {
 
 		test.done();
 	},
+	cacheFilesFailure: function(test) {
+		var libyui = require(libyuiPath)(grunt),
+			options = libyui.options;
+
+		try {
+			libyui.buildProperties.cacheFiles(options);
+		}
+		catch(e) {
+			test.equal(e.message, libyui.MESSAGE_CACHE_NOT_INITIALIZED);			
+		}
+
+		test.done();
+	},
+	cacheFiles: function(test) {
+
+
+
+
+		test.done();
+	};
 	init: function(test) {
 		var msg = 'Tests the build property cache',
 			moduleName = 'star-widget',
