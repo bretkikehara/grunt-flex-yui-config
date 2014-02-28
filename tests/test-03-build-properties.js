@@ -2,17 +2,12 @@
 var fs = require('fs'),
     grunt = require('grunt'),
     libpath = require('path'),
-    libyuiPath = __dirname + '/../lib/yui-lib.js',
-    libyui = require(libyuiPath)(grunt),
-    options = libyui.options;
-    
-// set default options.
-options.srcDir = 'tests/src';
-options.buildDir = 'tests/build';
+    libyuiInstance = require(__dirname + '/../lib/yui-lib.js');
 
 module.exports = {
     getModuleName: function(test) {
-        var checkPath = function(filepath, expected) {
+        var libyui = libyuiInstance(grunt),
+            checkPath = function(filepath, expected) {
                 var actual = libyui.buildProperties.getModuleName(filepath);
                 test.equal(actual, expected, 'Module name should be found from path');
             };
@@ -33,7 +28,8 @@ module.exports = {
         test.done();
     },
     getFileName: function(test) {
-        var checkFile = function(filepath, expected) {
+        var libyui = libyuiInstance(grunt),
+            checkFile = function(filepath, expected) {
                 var actual = libyui.buildProperties.getFileName(filepath);
                 test.equal(actual, expected, 'Module name should be found from path');
             };
@@ -54,11 +50,19 @@ module.exports = {
         test.done();
     },
     find: function(test) {
-        var actual = libyui.buildProperties.find(options),
+        var libyui = libyuiInstance(grunt),
+            actual,
             expected = {
                 'star-widget': true,
                 'star-widget-plugin': true
             };
+
+
+        // set default options.
+        libyui.options.srcDir = 'tests/src';
+        libyui.options.buildDir = 'tests/build';
+
+        actual = libyui.buildProperties.find(libyui.options)
 
         actual = actual.map(function(filepath) {
             return libyui.buildProperties.getModuleName(filepath);
@@ -69,7 +73,7 @@ module.exports = {
         test.done();
     },
     cacheFilesFailure: function(test) {
-        var libyui = require(libyuiPath)(grunt),
+        var libyui = libyuiInstance(grunt),
             options = libyui.options;
 
         try {
@@ -82,7 +86,7 @@ module.exports = {
         test.done();
     },
     cacheFiles: function(test) {
-        var options = libyui.options,
+        var libyui = libyuiInstance(grunt),
             moduleName = 'star-widget',
             cache,
             mtime,
@@ -90,6 +94,11 @@ module.exports = {
                 'star-panel',
                 'star-tooltip'
             ];
+
+
+        // set default options.
+        libyui.options.srcDir = 'tests/src';
+        libyui.options.buildDir = 'tests/build';
 
         // create a cache
         libyui.buildProperties.cache = {};
@@ -104,7 +113,7 @@ module.exports = {
                 }
             }
         };
-        libyui.buildProperties.cacheFiles(options, moduleName);
+        libyui.buildProperties.cacheFiles(libyui.options, moduleName);
 
         // check the cache
         cache = libyui.buildProperties.cache[moduleName].jsfiles;
@@ -127,13 +136,17 @@ module.exports = {
         test.done();
     },
     cacheBuildFileFailure: function(test) {
-        var libyui = require(libyuiPath)(grunt);
+        var libyui = libyuiInstance(grunt);
 
         test.expect(2);
 
+        // set default options.
+        libyui.options.srcDir = 'tests/src';
+        libyui.options.buildDir = 'tests/build';
+
         // cache not initialized.
         try {
-            libyui.buildProperties.cacheBuildFile(options);
+            libyui.buildProperties.cacheBuildFile(libyui.options);
         }
         catch(e) {
             test.equal(e.message, libyui.MESSAGE_CACHE_NOT_INITIALIZED);
@@ -142,7 +155,7 @@ module.exports = {
         // build file not defined.
         libyui.buildProperties.cache = {};
         try {
-            libyui.buildProperties.cacheBuildFile(options);
+            libyui.buildProperties.cacheBuildFile(libyui.options);
         }
         catch(e) {
             test.equal(e.message, libyui.MESSAGE_BUILD_FILE_UNDEFINED);
@@ -151,18 +164,25 @@ module.exports = {
         test.done();
     },
     cacheBuildFile: function(test) {
-        var libyui = require(libyuiPath)(grunt),
-            buildFile = libpath.join(options.srcDir, "star-widget/build.json");
+        var libyui = libyuiInstance(grunt),
+            buildFile;
+
+        // set default options.
+        libyui.options.srcDir = 'tests/src';
+        libyui.options.buildDir = 'tests/build';
+        
+        buildFile = libpath.join(libyui.options.srcDir, "star-widget/build.json")
 
         libyui.buildProperties.cache = {};
-        libyui.buildProperties.cacheBuildFile(options, buildFile);
+        libyui.buildProperties.cacheBuildFile(libyui.options, buildFile);
 
         test.ok(libyui.buildProperties.cache['star-widget'], 'Has star-widget');
 
         test.done();
     },
     init: function(test) {
-        var msg = 'Tests the build property cache',
+        var libyui = libyuiInstance(grunt),
+            msg = 'Tests the build property cache',
             moduleName = 'star-widget',
             cache,
             expected = {
@@ -172,16 +192,15 @@ module.exports = {
             },
             time = Date.now();
 
-        // initialize cache
-        libyui.buildProperties.init(options);
-        cache = libyui.buildProperties.cache;
+        // set default options.
+        libyui.options.srcDir = 'tests/src';
+        libyui.options.buildDir = 'tests/build';
 
-        // check submodule modified time.
-        // Object.keys(cache[moduleName].jsfiles).forEach(function(jsfile) {
-        //     test.ok(expected[jsfile], "File info has been cached");
-        //     test.notEqual(cache[moduleName].jsfiles[jsfile], null, "File is in memory");
-        //     test.ok(cache[moduleName].jsfiles[jsfile].mtime > time, "Last modified time is stored");
-        // }, this);
+        test.ok(!libyui.buildProperties.cache, 'Cache has been created');
+
+        // initialize cache
+        libyui.buildProperties.init(libyui.options);
+        test.ok(libyui.buildProperties.cache, 'Cache has been created');
 
         test.done();
     }
