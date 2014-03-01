@@ -89,7 +89,6 @@ module.exports = {
         var libyui = libyuiInstance(grunt),
             moduleName = 'star-widget',
             cache,
-            mtime,
             expected = [
                 'star-panel',
                 'star-tooltip'
@@ -118,13 +117,12 @@ module.exports = {
         // check the cache
         cache = libyui.buildProperties.cache[moduleName].jsfiles;
 
-        mtime = Date.now();
         Object.keys(cache).forEach(function(submoduleFile) {
             // ensure the build time has been set
-            test.ok(cache[submoduleFile].mtime <= mtime, 'Build time is afterwards');
+            test.equal(cache[submoduleFile].mtime, 0, 'Build time is afterwards');
 
-            // check whether the file content is stored in memory.
-            test.ok(cache[submoduleFile].content, 'Module content has been stored');
+            // check whether the file content is null.
+            test.ok(!cache[submoduleFile].content, 'Module content has been stored');
         });
 
         // check whether the files are correctly associating the modules
