@@ -36,12 +36,13 @@ module.exports = {
 	compile: function(test) {
 		var libyui = libyuiInstance(grunt),
 			expected = [
+        'config.js',
 				'star-panel/star-panel.js',
 				'star-overlay/star-overlay.js',
 				'star-tooltip/star-tooltip.js',
 				'star-plugin-widget-content-anim/star-plugin-widget-content-anim.js',
 				'star-plugin-widget-button-anim/star-plugin-widget-button-anim.js',
-				'star-plugin-widget-visible-anim/star-plugin-widget-visible-anim.js' 	
+				'star-plugin-widget-visible-anim/star-plugin-widget-visible-anim.js'
 			],
 			actual;
 
@@ -49,19 +50,23 @@ module.exports = {
         libyui.options.srcDir = srcDir;
         libyui.options.buildDir = buildDir;
 
+        // initialize the values.
+        libyui.template.init(libyui.options);
+        libyui.config.write(libyui.options);
+
         // compile the modules.
         libyui.modules.compile(libyui.options)
 
 		actual = grunt.file.expand({
 			cwd: buildDir
-		}, "**/*.js");
+		}, "**/*[^-raw].js");
 
-        expected.forEach(function(file) {
-        	var index = actual.indexOf(file);
-        	test.ok(index > -1, 'Module must be found');
-        	actual.splice(index, 1);
-        });
-        test.equal(actual.length, 0, "There aren't any leftover modules");
+    expected.forEach(function(file) {
+    	index = actual.indexOf(file);
+    	test.ok(index > -1, 'Module must be found');
+    	actual.splice(index, 1);
+    });
+    test.equal(actual.length, 0, "All modules expected have been found.");
 
 		test.done();
 	}
