@@ -3,18 +3,18 @@ var fs = require('fs'),
 	grunt = require('grunt'),
 	libpath = __dirname + '/../lib/yui-lib.js',
 	libyui = require(libpath)(grunt),
-	checkRequiredModules = function(module, modules) {
-		var foundUnexpectedModule = false;
-		module.requires.forEach(function(reqModule) {
-			var index = modules.indexOf(reqModule);
+	checkArrays = function(array1, array2) {
+		var foundUnexpected = false;
+		array1.forEach(function(array1Element) {
+			var index = array2.indexOf(array1Element);
 			if (index > -1) {
-				modules.splice(index, 1);
+				array2.splice(index, 1);
 			}
 			else {
-				foundUnexpectedModule = true;
+				foundUnexpected = true;
 			}
 		});
-		return !foundUnexpectedModule && modules.length === 0;
+		return !foundUnexpected && array2.length === 0;
 	};
 
 /**
@@ -57,7 +57,7 @@ module.exports = {
 
 		// test the individual modules.
 		modules = GLOBAL.YUI.config.modules;
-		isFound = checkRequiredModules(modules[name], [
+		isFound = checkArrays(modules[name].requires, [
 			"overlay",
 			"star-plugin-widget-visible-anim",
 			"star-plugin-widget-content-anim",
@@ -75,7 +75,7 @@ module.exports = {
 
 		// test the individual modules.
 		modules = GLOBAL.YUI.config.modules;
-		isFound = checkRequiredModules(modules[name], [
+		isFound = checkArrays(modules[name].requires, [
 			"transition",
 			"plugin"
 		]);
