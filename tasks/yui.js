@@ -9,7 +9,7 @@
 module.exports = function(grunt) {
     "use strict";
 
-    var lib = require('./yui-lib.js')(grunt);
+    var lib = require(__dirname + '/../lib/yui-lib.js')(grunt);
 
     grunt.registerTask('yui',
         'Defines the YUI task',
@@ -17,15 +17,15 @@ module.exports = function(grunt) {
 
             // write to global options
             var options = this.options(lib.options);
-            lib.init(options);
+            lib.template.init(options);
 
             // run task phases.
             if (phase === 'config') {
-                lib.writeConfig(options);
+                lib.config.write(options);
             }
             else {
-                lib.writeConfig(options);
-                lib.writeModules(options);
+                lib.config.write(options);
+                lib.modules.compile(options);
             }
         }
     );

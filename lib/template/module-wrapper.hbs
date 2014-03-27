@@ -4,6 +4,8 @@
 * @varible name - will be replace with the script name defined in the build file.
 * @varible script - will be replace with the script content.
 */
+{{prependfiles}}
 YUI.add('{{name}}', function(Y, NAME) {
 	{{{script}}}
-}, '{{version}}', {{{meta}}});
+}, '{{version}}', {{{config}}});
+{{appendfiles}}
