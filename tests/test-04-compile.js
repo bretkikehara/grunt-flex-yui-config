@@ -46,16 +46,16 @@ module.exports = {
       ],
       actual;
 
-        // set default options.
-        libyui.options.srcDir = srcDir;
-        libyui.options.buildDir = buildDir;
+    // set default options.
+    libyui.options.srcDir = srcDir;
+    libyui.options.buildDir = buildDir;
 
-        // initialize the values.
-        libyui.template.init(libyui.options);
-        libyui.config.write(libyui.options);
+    // initialize the values.
+    libyui.template.init(libyui.options);
+    libyui.config.write(libyui.options);
 
-        // compile the modules.
-        libyui.modules.compile(libyui.options);
+    // compile the modules.
+    libyui.modules.compile(libyui.options);
 
     actual = grunt.file.expand({
       cwd: buildDir
