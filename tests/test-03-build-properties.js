@@ -62,7 +62,7 @@ module.exports = {
         libyui.options.srcDir = 'tests/src';
         libyui.options.buildDir = 'tests/build';
 
-        actual = libyui.buildProperties.find(libyui.options)
+        actual = libyui.buildProperties.find(libyui.options);
 
         actual = actual.map(function(filepath) {
             return libyui.buildProperties.getModuleName(filepath);
@@ -169,7 +169,7 @@ module.exports = {
         libyui.options.srcDir = 'tests/src';
         libyui.options.buildDir = 'tests/build';
         
-        buildFile = libpath.join(libyui.options.srcDir, "star-widget/build.json")
+        buildFile = libpath.join(libyui.options.srcDir, "star-widget/build.json");
 
         libyui.buildProperties.cache = {};
         libyui.buildProperties.cacheBuildFile(libyui.options, buildFile);

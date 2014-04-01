@@ -15,11 +15,11 @@ var deleteFolderRecursive = function(path) {
     libfs.readdirSync(path).forEach(function(file,index) {
       var curPath = path + "/" + file;
       if(libfs.lstatSync(curPath).isDirectory()) {
-      	// recurse
+        // recurse
         deleteFolderRecursive(curPath);
       }
       else {
-      	// delete file
+        // delete file
         libfs.unlinkSync(curPath);
       }
     });
@@ -29,22 +29,22 @@ var deleteFolderRecursive = function(path) {
 
 
 module.exports = {
-	setUp: function(callback) {
-		deleteFolderRecursive(buildDir);
-		callback();
-	},
-	compile: function(test) {
-		var libyui = libyuiInstance(grunt),
-			expected = [
+  setUp: function(callback) {
+    deleteFolderRecursive(buildDir);
+    callback();
+  },
+  compile: function(test) {
+    var libyui = libyuiInstance(grunt),
+      expected = [
         'config.js',
-				'star-panel/star-panel.js',
-				'star-overlay/star-overlay.js',
-				'star-tooltip/star-tooltip.js',
-				'star-plugin-widget-content-anim/star-plugin-widget-content-anim.js',
-				'star-plugin-widget-button-anim/star-plugin-widget-button-anim.js',
-				'star-plugin-widget-visible-anim/star-plugin-widget-visible-anim.js'
-			],
-			actual;
+        'star-panel/star-panel.js',
+        'star-overlay/star-overlay.js',
+        'star-tooltip/star-tooltip.js',
+        'star-plugin-widget-content-anim/star-plugin-widget-content-anim.js',
+        'star-plugin-widget-button-anim/star-plugin-widget-button-anim.js',
+        'star-plugin-widget-visible-anim/star-plugin-widget-visible-anim.js'
+      ],
+      actual;
 
         // set default options.
         libyui.options.srcDir = srcDir;
@@ -55,19 +55,19 @@ module.exports = {
         libyui.config.write(libyui.options);
 
         // compile the modules.
-        libyui.modules.compile(libyui.options)
+        libyui.modules.compile(libyui.options);
 
-		actual = grunt.file.expand({
-			cwd: buildDir
-		}, "**/*[^-raw].js");
+    actual = grunt.file.expand({
+      cwd: buildDir
+    }, "**/*[^-raw].js");
 
     expected.forEach(function(file) {
-    	index = actual.indexOf(file);
-    	test.ok(index > -1, 'Module must be found');
-    	actual.splice(index, 1);
+      var index = actual.indexOf(file);
+      test.ok(index > -1, 'Module must be found');
+      actual.splice(index, 1);
     });
     test.equal(actual.length, 0, "All modules expected have been found.");
 
-		test.done();
-	}
+    test.done();
+  }
 };
