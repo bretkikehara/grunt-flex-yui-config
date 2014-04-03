@@ -25,8 +25,8 @@ module.exports = function(grunt) {
         },
         yui: {
             options: {
-                buildDir: 'tests/mock/build',
-                srcDir: 'tests/mock/src',
+                buildDir: 'tests/yui3/build',
+                srcDir: 'tests/yui3/src',
                 space: 4
             }
         }
