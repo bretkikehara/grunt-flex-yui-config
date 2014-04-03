@@ -3,6 +3,10 @@ var grunt = require('grunt'),
 	libyuiPath = __dirname + '/../lib/yui-lib.js',
 	libyui = require(libyuiPath)(grunt);
 
+// global config
+libyui.options.buildDir = 'tests/basic/build';
+libyui.options.srcDir = 'tests/basic/src';
+
 module.exports = {
 	init: function(test) {
 		var options = libyui.options;

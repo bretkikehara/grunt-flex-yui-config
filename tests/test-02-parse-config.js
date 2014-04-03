@@ -17,6 +17,10 @@ var fs = require('fs'),
 		return !foundUnexpected && array2.length === 0;
 	};
 
+// global config
+libyui.options.buildDir = 'tests/basic/build';
+libyui.options.srcDir = 'tests/basic/src';
+
 /**
 * Mock the YUI object.
 */
@@ -31,15 +35,11 @@ module.exports = {
 	setUp: function(callback) {
 		var options = libyui.options;
 
-		// set default options.
-		options.srcDir = 'tests/src';
-		options.buildDir = 'tests/build';
-
         libyui.template.init(options);
 		libyui.config.write(options);
 
 		// simulate loading the modules
-		require(__dirname + '/build/config.js');
+		require(__dirname + '/basic/build/config.js');
 
 		callback();
 	},
@@ -48,6 +48,7 @@ module.exports = {
 		var metaFiles = libyui.config.find(libyui.options),
 			actual;
 
+		test.equal(metaFiles.length, 4, "Found all 4 meta files: " + metaFiles.length);
 		actual = checkArrays(metaFiles, [
 			'star-widget/meta/star-overlay.json',
 			'star-widget/meta/star-panel.json',
@@ -55,7 +56,7 @@ module.exports = {
 			'star-widget-plugin/meta/star-plugin.json'
 		]);
 
-		test.ok(actual, "Found all 4 meta files");
+		test.ok(actual, "Found all 4 meta files: " + metaFiles.length);
 
 		test.done();
 	},

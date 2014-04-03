@@ -3,8 +3,8 @@ var libfs = require('fs'),
     grunt = require('grunt'),
     libpath = require('path'),
     libyuiInstance = require(__dirname + '/../lib/yui-lib.js'),
-    srcDir = 'tests/src',
-    buildDir = 'tests/build',
+    srcDir = 'tests/basic/src',
+    buildDir = 'tests/basic/build',
     PATH_REGEX = /([^\\\/]+\.js)$/i;
 
 /**

@@ -9,8 +9,11 @@ module.exports = {
         var libyui = libyuiInstance(grunt),
             checkPath = function(filepath, expected) {
                 var actual = libyui.buildProperties.getModuleName(filepath);
-                test.equal(actual, expected, 'Module name should be found from path');
+                test.equal(actual, expected, 'Module name should be found from path: ' + actual);
             };
+
+        libyui.options.buildDir = 'tests/basic/build';
+        libyui.options.srcDir = 'tests/basic/src';
 
         // valid unix paths
         checkPath('star-widget-plugin/build.json', 'star-widget-plugin');
@@ -31,8 +34,10 @@ module.exports = {
         var libyui = libyuiInstance(grunt),
             checkFile = function(filepath, expected) {
                 var actual = libyui.buildProperties.getFileName(filepath);
-                test.equal(actual, expected, 'Module name should be found from path');
+                test.equal(actual, expected, 'Module name should be found from path: ' + actual);
             };
+        libyui.options.buildDir = 'tests/basic/build';
+        libyui.options.srcDir = 'tests/basic/src';
 
         // valid unix paths
         checkFile('star-widget-plugin/build.json', 'build.json');
@@ -57,10 +62,8 @@ module.exports = {
                 'star-widget-plugin': true
             };
 
-
-        // set default options.
-        libyui.options.srcDir = 'tests/src';
-        libyui.options.buildDir = 'tests/build';
+        libyui.options.buildDir = 'tests/basic/build';
+        libyui.options.srcDir = 'tests/basic/src';
 
         actual = libyui.buildProperties.find(libyui.options);
 
@@ -68,13 +71,15 @@ module.exports = {
             return libyui.buildProperties.getModuleName(filepath);
         });
         actual.forEach(function(moduleName) {
-            test.ok(expected[moduleName], 'Modules are all found');
+            test.ok(expected[moduleName], 'Modules are all found: ' + moduleName);
         });     
         test.done();
     },
     cacheFilesFailure: function(test) {
         var libyui = libyuiInstance(grunt),
             options = libyui.options;
+        options.buildDir = 'tests/basic/build';
+        options.srcDir = 'tests/basic/src';
 
         try {
             libyui.buildProperties.cacheFiles(options);
@@ -96,8 +101,8 @@ module.exports = {
 
 
         // set default options.
-        libyui.options.srcDir = 'tests/src';
-        libyui.options.buildDir = 'tests/build';
+        libyui.options.buildDir = 'tests/basic/build';
+        libyui.options.srcDir = 'tests/basic/src';
 
         // create a cache
         libyui.buildProperties.cache = {};
@@ -139,8 +144,8 @@ module.exports = {
         test.expect(2);
 
         // set default options.
-        libyui.options.srcDir = 'tests/src';
-        libyui.options.buildDir = 'tests/build';
+        libyui.options.buildDir = 'tests/basic/build';
+        libyui.options.srcDir = 'tests/basic/src';
 
         // cache not initialized.
         try {
@@ -166,8 +171,8 @@ module.exports = {
             buildFile;
 
         // set default options.
-        libyui.options.srcDir = 'tests/src';
-        libyui.options.buildDir = 'tests/build';
+        libyui.options.buildDir = 'tests/basic/build';
+        libyui.options.srcDir = 'tests/basic/src';
         
         buildFile = libpath.join(libyui.options.srcDir, "star-widget/build.json");
 
@@ -191,8 +196,8 @@ module.exports = {
             time = Date.now();
 
         // set default options.
-        libyui.options.srcDir = 'tests/src';
-        libyui.options.buildDir = 'tests/build';
+        libyui.options.buildDir = 'tests/basic/build';
+        libyui.options.srcDir = 'tests/basic/src';
 
         test.ok(!libyui.buildProperties.cache, 'Cache has been created');
 
