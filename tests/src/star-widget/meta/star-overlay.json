@@ -1,6 +1,0 @@
-{
-  "star-overlay": {
-    "requires": ["overlay", "star-plugin-widget-visible-anim", "star-plugin-widget-content-anim", "dd-plugin"],
-    "skinnable": true
-  }
-}

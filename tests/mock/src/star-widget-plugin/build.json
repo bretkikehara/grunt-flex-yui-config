@@ -1,0 +1,14 @@
+{
+  "name": "star-plugin",
+  "builds": {
+    "star-plugin-widget-visible-anim": {
+      "jsfiles": ["star-plugin-widget-visible-anim.js"]
+    },
+    "star-plugin-widget-content-anim": {
+      "jsfiles": ["star-plugin-widget-content-anim.js"]
+    },
+    "star-plugin-widget-button-anim": {
+      "jsfiles": ["star-plugin-widget-button-anim.js"]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "star-panel": {
+    "requires": ["panel", "star-plugin-widget-visible-anim", "star-plugin-widget-button-anim", "dd-plugin", "io"],
+    "skinnable": true
+  }
+}

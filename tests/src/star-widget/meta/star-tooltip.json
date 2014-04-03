@@ -1,6 +1,0 @@
-{
-  "star-tooltip": {
-    "requires": ["overlay", "transition", "star-plugin-widget-visible-anim"],
-    "skinnable": true
-  }
-}

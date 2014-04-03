@@ -18,8 +18,8 @@ var fs = require('fs'),
 	};
 
 // global config
-libyui.options.buildDir = 'tests/basic/build';
-libyui.options.srcDir = 'tests/basic/src';
+libyui.options.buildDir = 'tests/mock/build';
+libyui.options.srcDir = 'tests/mock/src';
 
 /**
 * Mock the YUI object.
@@ -39,7 +39,7 @@ module.exports = {
 		libyui.config.write(options);
 
 		// simulate loading the modules
-		require(__dirname + '/basic/build/config.js');
+		require(__dirname + '/mock/build/config.js');
 
 		callback();
 	},

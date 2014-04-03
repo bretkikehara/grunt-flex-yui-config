@@ -1,0 +1,15 @@
+{
+  "star-plugin": {
+    "submodules": {
+      "star-plugin-widget-visible-anim": {
+        "requires": ["anim", "plugin"]
+      },
+      "star-plugin-widget-content-anim": {
+        "requires": ["anim", "plugin"]
+      },
+      "star-plugin-widget-button-anim": {
+        "requires": ["transition", "plugin"]
+      }
+    }
+  }
+}

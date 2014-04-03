@@ -4,8 +4,8 @@ var grunt = require('grunt'),
 	libyui = require(libyuiPath)(grunt);
 
 // global config
-libyui.options.buildDir = 'tests/basic/build';
-libyui.options.srcDir = 'tests/basic/src';
+libyui.options.buildDir = 'tests/mock/build';
+libyui.options.srcDir = 'tests/mock/src';
 
 module.exports = {
 	init: function(test) {
