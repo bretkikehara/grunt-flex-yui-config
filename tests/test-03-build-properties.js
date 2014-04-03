@@ -33,24 +33,16 @@ module.exports = {
     getFileName: function(test) {
         var libyui = libyuiInstance(grunt),
             checkFile = function(filepath, expected) {
-                var actual = libyui.buildProperties.getFileName(filepath);
+                var actual = libyui.buildProperties.getFilePath(libyui.options, filepath);
                 test.equal(actual, expected, 'Module name should be found from path: ' + actual);
             };
         libyui.options.buildDir = 'tests/mock/build';
         libyui.options.srcDir = 'tests/mock/src';
 
         // valid unix paths
-        checkFile('star-widget-plugin/build.json', 'build.json');
-        checkFile('/star-widget-plugin/build.json', 'build.json');
-        checkFile('./star-widget-plugin/build.json', 'build.json');
-
-        // valid windows paths
-        checkFile('star-widget-plugin\\build.json', 'build.json');
-        checkFile('\\star-widget-plugin\\build.json', 'build.json');
-        checkFile('.\\star-widget-plugin\\build.json', 'build.json');
-
-        // long path.
-        checkFile('tests/src/star-widget-plugin/build.json', 'build.json');
+        checkFile('star-widget-plugin/build.json', 'js/star-widget-plugin/build.json');
+        checkFile('/star-widget-plugin/build.json', '/star-widget-plugin/build.json');
+        checkFile('./star-widget-plugin/build.json', 'js/star-widget-plugin/build.json');
 
         test.done();
     },
@@ -131,10 +123,10 @@ module.exports = {
         });
 
         // check whether the files are correctly associating the modules
-        cache['star-panel.js'].modules.forEach(function(submoduleName) {
+        cache['js/star-panel.js'].modules.forEach(function(submoduleName) {
             test.ok(expected.indexOf(submoduleName) > -1, 'Module exists: ' + submoduleName);
         });
-        test.equal(cache['star-tooltip.js'].modules[0], 'star-panel', 'Module exists');
+        test.equal(cache['js/star-tooltip.js'].modules[0], 'star-panel', 'Module exists');
 
         test.done();
     },
