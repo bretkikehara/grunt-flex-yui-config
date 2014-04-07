@@ -41,19 +41,25 @@ module.exports = {
 
         test.done();
     },
-    getFileName: function(test) {
+    getFilePath: function(test) {
         var libyui = libyuiInstance(grunt),
-            checkFile = function(filepath, expected) {
+            _checkFilePath = function(filepath, expected) {
                 var actual = libyui.buildProperties.getFilePath(libyui.options, filepath);
                 test.equal(actual, expected, 'Module name should be found from path: ' + actual);
+            },
+            checkFilePath = function(filepath, expected) {
+                _checkFilePath(filepath, expected);
+                _checkFilePath(filepath.replace(/\//g, '\\'), expected);
+
+                filepath = './' + filepath;
+                _checkFilePath(filepath, expected);
+                _checkFilePath(filepath.replace(/\//g, '\\'), expected);
             };
         libyui.options.buildDir = 'tests/mock/build';
         libyui.options.srcDir = 'tests/mock/src';
 
-        // valid unix paths
-        checkFile('star-widget-plugin/build.json', 'js/star-widget-plugin/build.json');
-        checkFile('/star-widget-plugin/build.json', '/star-widget-plugin/build.json');
-        checkFile('./star-widget-plugin/build.json', 'js/star-widget-plugin/build.json');
+        // get relative file paths
+        checkFilePath('star-widget-plugin/build.json', 'js/star-widget-plugin/build.json');
 
         test.done();
     },
