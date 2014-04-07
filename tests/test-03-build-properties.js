@@ -7,26 +7,37 @@ var fs = require('fs'),
 module.exports = {
     getModuleName: function(test) {
         var libyui = libyuiInstance(grunt),
-            checkPath = function(filepath, expected) {
+            _checkPath = function(filepath, expected) {
                 var actual = libyui.buildProperties.getModuleName(filepath);
                 test.equal(actual, expected, 'Module name should be found from path: ' + actual);
-            };
+            },
+            checkPath = function(filepath, expected) {
+                _checkPath(filepath, expected);
+                _checkPath(filepath.replace(/\//g, '\\'), expected);
+
+                filepath = '/' + filepath;
+                _checkPath(filepath, expected);
+                _checkPath(filepath.replace(/\//g, '\\'), expected);
+
+                filepath = '.' + filepath;
+                _checkPath(filepath, expected);
+                _checkPath(filepath.replace(/\//g, '\\'), expected);
+            },
+            expected,
+            path;
 
         libyui.options.buildDir = 'tests/mock/build';
         libyui.options.srcDir = 'tests/mock/src';
 
         // valid unix paths
-        checkPath('star-widget-plugin/build.json', 'star-widget-plugin');
-        checkPath('/star-widget-plugin/build.json', 'star-widget-plugin');
-        checkPath('./star-widget-plugin/build.json', 'star-widget-plugin');
-
-        // valid windows paths
-        checkPath('star-widget-plugin\\build.json', 'star-widget-plugin');
-        checkPath('\\star-widget-plugin\\build.json', 'star-widget-plugin');
-        checkPath('.\\star-widget-plugin\\build.json', 'star-widget-plugin');
+        path = 'star-widget-plugin/build.json';
+        expected = 'star-widget-plugin';
+        checkPath(path, expected);
 
         // long path.
-        checkPath('tests/src/star-widget-plugin/build.json', 'star-widget-plugin');
+        path = 'really/long/pathname//tests/src/asdf-jkl/build.json';
+        expected = 'asdf-jkl';
+        checkPath(path, expected);
 
         test.done();
     },
