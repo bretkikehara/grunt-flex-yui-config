@@ -49,55 +49,86 @@ module.exports = {
 			actual;
 
 		test.equal(metaFiles.length, 4, "Found all 4 meta files: " + metaFiles.length);
-		actual = checkArrays(metaFiles, [
+		test.deepEqual(metaFiles, [
+			'star-widget-plugin/meta/star-plugin.json',
 			'star-widget/meta/star-overlay.json',
 			'star-widget/meta/star-panel.json',
-			'star-widget/meta/star-tooltip.json',
-			'star-widget-plugin/meta/star-plugin.json'
-		]);
-
-		test.ok(actual, "Found all 4 meta files: " + metaFiles.length);
+			'star-widget/meta/star-tooltip.json'
+		], 'Found all meta files');
 
 		test.done();
 	},
 	// ensure that the written config will load the modules.
-	checkAvailable: function(test) {
+	checkConfiguration: function(test) {
+		var checkModule = function(name, opts) {
+			var module = GLOBAL.YUI.config.modules[name],
+				expectedKeys;
+			test.ok(module, 'Expect module: ' + name);
+
+			expectedkeys = Object.keys(module);
+			Object.keys(opts).forEach(function(optProp) {
+				var index = expectedkeys.indexOf(optProp);
+				if (index > -1) {
+					expectedkeys.splice(index, 1);
+				}
+				else {
+					throw new Exception("Expected property was not found in configuration");
+				}
+
+				test.deepEqual(module[optProp], opts[optProp], optProp + ' was expected');
+			});
+		};
+
 		// check the whether the templates worked.
 		test.ok(GLOBAL.YUI.config, "Config is not null");
 		test.ok(GLOBAL.YUI.config.modules, "Modules is not null");
-		test.done();
-	}, 
-	// ensure that the module was been written verbatim
-	checkStarOverlay: function (test) {
-		var name = 'star-overlay',
-			modules, isFound;
 
-		// test the individual modules.
-		modules = GLOBAL.YUI.config.modules;
-		isFound = checkArrays(modules[name].requires, [
-			"overlay",
-			"star-plugin-widget-visible-anim",
-			"star-plugin-widget-content-anim",
-			"dd-plugin"
-		]);
-		test.ok(isFound, "Found all modules");
-		test.ok(modules[name].skinnable, 'Module is skinnable');
-		test.equal(Object.keys(modules[name]).length, 2, 'Module has 2 properties');
-		test.done();
-	}, 
-	// ensure that the module was been written verbatim
-	checkWidgetButtonPlugin: function (test) {
-		var name = "star-plugin-widget-button-anim",
-			modules, isFound;
+		checkModule('star-plugin-widget-visible-anim', {
+			"requires": [
+				"anim",
+				"plugin"
+			]
+		});
+		checkModule('star-plugin-widget-content-anim', {
+			"requires": [
+				"anim",
+				"plugin"
+			]
+		});
+		checkModule('star-plugin-widget-button-anim', {
+			"requires": [
+				"transition",
+				"plugin"
+			]
+		});
+		checkModule('star-overlay', {
+		    "requires": [
+		    	"overlay",
+		    	"star-plugin-widget-visible-anim",
+		    	"star-plugin-widget-content-anim",
+		    	"dd-plugin"
+		    ],
+		    "skinnable": true
+		});
+		checkModule('star-panel', {
+		    "requires": [
+		    	"panel",
+		    	"star-plugin-widget-visible-anim",
+		    	"star-plugin-widget-button-anim",
+		    	"dd-plugin",
+		    	"io"
+		    ],
+		    "skinnable": true
+		});
+		checkModule('star-tooltip', {
+		    "requires": [
+		    	"overlay",
+		    	"transition",
+		    	"star-plugin-widget-visible-anim"
+		    ],
+		    "skinnable": true
+		});
 
-		// test the individual modules.
-		modules = GLOBAL.YUI.config.modules;
-		isFound = checkArrays(modules[name].requires, [
-			"transition",
-			"plugin"
-		]);
-		test.ok(isFound, "Found all modules");
-		test.equal(Object.keys(modules[name]).length, 1, 'Module has only 1 property');
 		test.done();
 	}
 };
