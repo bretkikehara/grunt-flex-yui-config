@@ -33,6 +33,44 @@ module.exports = {
     deleteFolderRecursive(buildDir);
     callback();
   },
+  init: function(test) {
+    var libyui = libyuiInstance(grunt),
+        options = libyui.options;
+
+    // set default options.
+    options.buildDir = 'tests/mock/build';
+    options.srcDir = 'tests/mock/src';
+
+    // initiate the build properties
+    libyui.buildProperties.init(libyui.options);
+    
+    // initiate the modules.
+    libyui.modules.init(options)
+    
+    // initiated the tests.
+    test.ok(libyui.modules.cache, 'Cache has been initiated');
+
+    // initiated the modules.
+    test.deepEqual(Object.keys(libyui.modules.cache), [
+      'star-widget-plugin',
+      'star-widget'
+    ], 'Testing the cached modules');
+
+
+    test.deepEqual(libyui.modules.cache['star-widget-plugin']['js/star-plugin-widget-visible-anim.js'], {
+      modules: ['star-plugin-widget-visible-anim'],
+      content: null,
+      mtime: 0
+    }, 'Test the js/star-plugin-widget-visible-anim.js cache');
+
+    test.deepEqual(libyui.modules.cache['star-widget-plugin']['js/star-plugin-widget-content-anim.js'], {
+      modules: [ 'star-plugin-widget-content-anim' ],
+      content: null,
+      mtime: 0
+    }, 'Test the js/star-plugin-widget-content-anim.js cache');
+
+    test.done();
+  },
   compile: function(test) {
     var libyui = libyuiInstance(grunt),
       expected = [
