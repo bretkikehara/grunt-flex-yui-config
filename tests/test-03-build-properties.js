@@ -84,69 +84,6 @@ module.exports = {
         });     
         test.done();
     },
-    cacheFilesFailure: function(test) {
-        var libyui = libyuiInstance(grunt),
-            options = libyui.options;
-        options.buildDir = 'tests/mock/build';
-        options.srcDir = 'tests/mock/src';
-
-        try {
-            libyui.buildProperties.cacheFiles(options);
-        }
-        catch(e) {
-            test.equal(e.message, libyui.MESSAGE_CACHE_NOT_INITIALIZED);            
-        }
-
-        test.done();
-    },
-    cacheFiles: function(test) {
-        var libyui = libyuiInstance(grunt),
-            moduleName = 'star-widget',
-            cache,
-            expected = [
-                'star-panel',
-                'star-tooltip'
-            ];
-
-
-        // set default options.
-        libyui.options.buildDir = 'tests/mock/build';
-        libyui.options.srcDir = 'tests/mock/src';
-
-        // create a cache
-        libyui.buildProperties.cache = {};
-        libyui.buildProperties.cache[moduleName] = {
-            "name": moduleName,
-            "builds": {
-                "star-panel": {
-                    "jsfiles": ["star-panel.js", "star-tooltip.js"]
-                },
-                "star-tooltip": {
-                    "jsfiles": ["star-tooltip.js"]
-                }
-            }
-        };
-        libyui.buildProperties.cacheFiles(libyui.options, moduleName);
-
-        // check the cache
-        cache = libyui.buildProperties.cache[moduleName].jsfiles;
-
-        Object.keys(cache).forEach(function(submoduleFile) {
-            // ensure the build time has been set
-            test.equal(cache[submoduleFile].mtime, 0, 'Build time is afterwards');
-
-            // check whether the file content is null.
-            test.ok(!cache[submoduleFile].content, 'Module content has been stored');
-        });
-
-        // check whether the files are correctly associating the modules
-        cache['js/star-panel.js'].modules.forEach(function(submoduleName) {
-            test.ok(expected.indexOf(submoduleName) > -1, 'Module exists: ' + submoduleName);
-        });
-        test.equal(cache['js/star-tooltip.js'].modules[0], 'star-panel', 'Module exists');
-
-        test.done();
-    },
     cacheBuildFileFailure: function(test) {
         var libyui = libyuiInstance(grunt);
 
@@ -202,6 +139,13 @@ module.exports = {
                 'star-overlay.js': true,
                 'star-tooltip.js': true
             },
+            checkCache = function(moduleName, build) {
+                var moduleCachedMsg = 'Module build.json cached: ' + moduleName,
+                    buildPropMsg = 'Build cached: ' + moduleName;
+                test.ok(libyui.buildProperties.cache[moduleName], moduleCachedMsg);
+
+                test.deepEqual(libyui.buildProperties.cache[moduleName], build, buildPropMsg);
+            },
             time = Date.now();
 
         // set default options.
@@ -212,7 +156,43 @@ module.exports = {
 
         // initialize cache
         libyui.buildProperties.init(libyui.options);
+
         test.ok(libyui.buildProperties.cache, 'Cache has been created');
+        checkCache('star-widget-plugin', {
+          "name": "star-plugin",
+          "builds": {
+            "star-plugin-widget-visible-anim": {
+              "jsfiles": ["star-plugin-widget-visible-anim.js"]
+            },
+            "star-plugin-widget-content-anim": {
+              "jsfiles": ["star-plugin-widget-content-anim.js"]
+            },
+            "star-plugin-widget-button-anim": {
+              "jsfiles": ["star-plugin-widget-button-anim.js"]
+            }
+          }
+        });
+        checkCache('star-widget', {
+          "name": "star-widget",
+          "exec": [
+            "less-compile"
+          ],
+          "builds": {
+            "star-panel": {
+              "jsfiles": ["star-panel.js"]
+            },
+            "star-overlay": {
+              "jsfiles": ["star-overlay.js"]
+            },    
+            "star-tooltip": {
+              "jsfiles": ["star-tooltip.js"]
+            }
+          }
+        });
+
+
+
+
 
         test.done();
     }
