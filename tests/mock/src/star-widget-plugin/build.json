@@ -1,5 +1,5 @@
 {
-  "name": "star-plugin",
+  "name": "star-widget-plugin",
   "builds": {
     "star-plugin-widget-visible-anim": {
       "jsfiles": ["star-plugin-widget-visible-anim.js"]

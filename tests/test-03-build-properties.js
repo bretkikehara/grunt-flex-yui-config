@@ -159,7 +159,7 @@ module.exports = {
 
         test.ok(libyui.buildProperties.cache, 'Cache has been created');
         checkCache('star-widget-plugin', {
-          "name": "star-plugin",
+          "name": "star-widget-plugin",
           "builds": {
             "star-plugin-widget-visible-anim": {
               "jsfiles": ["star-plugin-widget-visible-anim.js"]
@@ -189,10 +189,6 @@ module.exports = {
             }
           }
         });
-
-
-
-
 
         test.done();
     }
