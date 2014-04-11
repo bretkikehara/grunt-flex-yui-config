@@ -44,7 +44,7 @@ module.exports = {
     getFilePath: function(test) {
         var libyui = libyuiInstance(grunt),
             _checkFilePath = function(filepath, expected) {
-                var actual = libyui.buildProperties.getFilePath(libyui.options, filepath);
+                var actual = libyui.buildProperties.getFilePath(filepath);
                 test.equal(actual, expected, 'Module name should be found from path: ' + actual);
             },
             checkFilePath = function(filepath, expected) {
