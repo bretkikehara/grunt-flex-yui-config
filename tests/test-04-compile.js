@@ -27,12 +27,9 @@ var deleteFolderRecursive = function(path) {
   }
 };
 
+deleteFolderRecursive(buildDir);
 
 module.exports = {
-  setUp: function(callback) {
-    deleteFolderRecursive(buildDir);
-    callback();
-  },
   init: function(test) {
     var libyui = libyuiInstance(grunt),
         options = libyui.options;
@@ -99,12 +96,11 @@ module.exports = {
       cwd: buildDir
     }, "**/*[^-raw].js");
 
-    expected.forEach(function(file) {
-      var index = actual.indexOf(file);
-      test.ok(index > -1, 'Module must be found');
-      actual.splice(index, 1);
+    test.equal(actual.length, 7, "Expected 7 modules, found: " + actual.length);
+    expected.forEach(function(expected) {
+      var index = actual.indexOf(expected);
+      test.equal(actual[index], expected, 'Module found: ' + actual[index]);
     });
-    test.equal(actual.length, 0, "All modules expected have been found.");
 
     test.done();
   }
